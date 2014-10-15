@@ -20,11 +20,17 @@ public class Query {
   public Query(String query) {
     _query = query;
   }
+  
+  public String getQuery()
+  {
+	  return _query;
+  }
 
   public void processQuery() {
     if (_query == null) {
       return;
     }
+    _query=_query.replace('+', ' ');
     Scanner s = new Scanner(_query);
     while (s.hasNext()) {
       _tokens.add(s.next());
