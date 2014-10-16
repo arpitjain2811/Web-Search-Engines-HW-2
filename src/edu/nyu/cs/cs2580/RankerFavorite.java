@@ -3,7 +3,6 @@ package edu.nyu.cs.cs2580;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
-import java.util.function.DoubleUnaryOperator;
 
 import edu.nyu.cs.cs2580.QueryHandler.CgiArguments;
 import edu.nyu.cs.cs2580.SearchEngine.Options;
