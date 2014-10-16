@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -26,8 +27,9 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 
 
 	private static final long serialVersionUID = 2698138733115785548L;
-	
-	
+
+    private ReadCorpus DocReader = new ReadCorpus();
+    	
 	private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 //	private Vector<String> _terms = new Vector<String>();
 	private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
@@ -47,8 +49,21 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 
   @Override
   public void constructIndex() throws IOException {
-	 
-	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
+
+      String corpusDir = _options._corpusPrefix;
+      System.out.println("Constructing index documents in: " + corpusDir);
+
+      final File Dir = new File(corpusDir);
+      for (final File fileEntry : Dir.listFiles()) {
+	  if ( !fileEntry.isDirectory() ){
+	      System.out.println(fileEntry.getName());
+	      String nextDoc = DocReader.createFileInput(fileEntry);
+	      processDocument(nextDoc);
+	  } 
+      }
+
+      /*
+ 	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
 	  System.out.println("Construct index from: " + corpusFile);
 
 	    BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
@@ -61,6 +76,7 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 	    } finally {
 	      reader.close();
 	    }
+      */
 	    System.out.println(
 	        "Indexed " + Integer.toString(_numDocs) + " docs with " +
 	        Long.toString(_totalTermFrequency) + " terms.");
