@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,7 +25,9 @@ import edu.nyu.cs.cs2580.SearchEngine.Options;
  * @author congyu
  */
 class IndexerFullScan extends Indexer implements Serializable {
-  private static final long serialVersionUID = 1077111905740085030L;
+    private static final long serialVersionUID = 1077111905740085030L;
+
+    private ReadCorpus DocReader = new ReadCorpus();
 
   // Maps each term to their integer representation
   private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
@@ -61,6 +64,22 @@ class IndexerFullScan extends Indexer implements Serializable {
    */
   @Override
   public void constructIndex() throws IOException {
+      
+      String corpusDir = _options._corpusPrefix;
+      System.out.println("Constructing index documents in: " + corpusDir);
+
+      final File Dir = new File(corpusDir);
+      for (final File fileEntry : Dir.listFiles()) {
+	  if ( !fileEntry.isDirectory() ){
+	      System.out.println(fileEntry.getName());
+	      String nextDoc = DocReader.createFileInput(fileEntry);
+	      processDocument(nextDoc);
+	  } 
+      }
+
+
+
+      /*
     String corpusFile = _options._corpusPrefix + "/corpus.tsv";
     System.out.println("Construct index from: " + corpusFile);
 
@@ -73,6 +92,7 @@ class IndexerFullScan extends Indexer implements Serializable {
     } finally {
       reader.close();
     }
+      */
     System.out.println(
         "Indexed " + Integer.toString(_numDocs) + " docs with " +
         Long.toString(_totalTermFrequency) + " terms.");

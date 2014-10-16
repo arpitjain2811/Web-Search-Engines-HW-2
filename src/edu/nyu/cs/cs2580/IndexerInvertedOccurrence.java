@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,6 +28,9 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1626440145434710491L;
+
+    private ReadCorpus DocReader = new ReadCorpus();
+
 	private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 //	private Vector<String> _terms = new Vector<String>();
 	private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
@@ -47,7 +51,27 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
   }
 
   public void constructIndex() throws IOException {
+
+      String corpusDir = _options._corpusPrefix;
+      System.out.println("Constructing index documents in: " + corpusDir);
+
+      final File Dir = new File(corpusDir);
+      int n_doc = 0;
+      for (final File fileEntry : Dir.listFiles()) {
+	  if ( !fileEntry.isDirectory() ){
+	      System.out.println(fileEntry.getName());
+	      String nextDoc = DocReader.createFileInput(fileEntry);
+	      processDocument(nextDoc);
+
+	      _term_position.clear();
+	      
+	      n_doc++;
+	  } 
+      }
+      
+
 		 
+      /*
 	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
 	  System.out.println("Construct index from: " + corpusFile);
 
@@ -65,41 +89,42 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	    } finally {
 	      reader.close();
 	    }
-	    System.out.println(
-	        "Indexed " + Integer.toString(_numDocs) + " docs with " +
-	        Long.toString(_totalTermFrequency) + " terms.");
-
-	    String indexFile = _options._indexPrefix + "/corpus.idx";
-	    System.out.println("Store index to: " + indexFile);
-	    ObjectOutputStream writer =
-	        new ObjectOutputStream(new FileOutputStream(indexFile));
-	    
-	    Vector<Integer> list=new Vector<Integer>();
-	    Vector<Integer> skip=new Vector<Integer>();
-	    Vector<Integer> posting=new Vector<Integer>();
-	    
-	    
-	    System.out.print("Dic");
-	    for(int i: _dictionary.values())
-	    {
-	    	list=_term_list.get(i);
-	    	skip=_skip_pointer.get(i);
-	    	
-	    	posting= update_skip(skip,skip.size());
-	    	posting.addAll(list);
-	    	_postings.put(i, posting);
-	    	
-	    }
-	    
-	    
-	    System.out.print("Dic");
-	    _term_list=null;
-	    _skip_pointer=null;
-	    _term_position=null;
-	   
-	    writer.writeObject(this);
-	    writer.close();
-	  
+      */	
+      System.out.println(
+			 "Indexed " + Integer.toString(_numDocs) + " docs with " +
+			 Long.toString(_totalTermFrequency) + " terms.");
+      
+      String indexFile = _options._indexPrefix + "/corpus.idx";
+      System.out.println("Store index to: " + indexFile);
+      ObjectOutputStream writer =
+	  new ObjectOutputStream(new FileOutputStream(indexFile));
+      
+      Vector<Integer> list=new Vector<Integer>();
+      Vector<Integer> skip=new Vector<Integer>();
+      Vector<Integer> posting=new Vector<Integer>();
+      
+      
+      System.out.print("Dic");
+      for(int i: _dictionary.values())
+	  {
+	      list=_term_list.get(i);
+	      skip=_skip_pointer.get(i);
+	      
+	      posting= update_skip(skip,skip.size());
+	      posting.addAll(list);
+	      _postings.put(i, posting);
+	      
+	  }
+      
+      
+      System.out.print("Dic");
+      _term_list=null;
+      _skip_pointer=null;
+      _term_position=null;
+      
+      writer.writeObject(this);
+      writer.close();
+      
   }
 
   private Vector<Integer> update_skip(Vector<Integer> skip, int size) {
