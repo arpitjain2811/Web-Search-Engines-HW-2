@@ -2,7 +2,7 @@ JCC = javac
 JVM = java
 JFLAGS = -classpath jsoup-1.8.1.jar
 JVMFLAGS = -classpath "jsoup-1.8.1.jar:src"
-
+RUNFLAGS = -classpath "jsoup-1.8.1.jar:src" -Xmx256m
 .SUFFIXES: .java .class
 
 .java.class:
@@ -38,6 +38,8 @@ default:
 index:
 	$(JVM) $(JVMFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=index --options=conf/engine.conf
 
+run:
+	$(JVM) $(RUNFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=serve --port=25808 --options=conf/engine.conf 
 
 clean:
 	find . -name '*.class' -exec rm -rf {} \;

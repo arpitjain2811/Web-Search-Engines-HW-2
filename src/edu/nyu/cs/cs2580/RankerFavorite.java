@@ -41,6 +41,8 @@ class RankerFavorite extends Ranker {
     	System.out.println(i._docid);
     	
     	all.add(scoreDocument(query, i));
+    	
+    	System.out.println("Next Called Doc"+i._docid);
     	i=_indexer.nextDoc(query,i._docid);
     	
     }

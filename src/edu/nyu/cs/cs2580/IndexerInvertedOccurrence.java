@@ -52,26 +52,31 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 
   public void constructIndex() throws IOException {
 
-      String corpusDir = _options._corpusPrefix;
-      System.out.println("Constructing index documents in: " + corpusDir);
-
-      final File Dir = new File(corpusDir);
-      int n_doc = 0;
-      for (final File fileEntry : Dir.listFiles()) {
-	  if ( !fileEntry.isDirectory() ){
-	      System.out.println(fileEntry.getName());
-	      String nextDoc = DocReader.createFileInput(fileEntry);
-	      processDocument(nextDoc);
-
-	      _term_position.clear();
-	      
-	      n_doc++;
-	  } 
-      }
+//      String corpusDir = _options._corpusPrefix;
+//      System.out.println("Constructing index documents in: " + corpusDir);
+//
+//      final File Dir = new File(corpusDir);
+//      int n_doc = 0;
+//      for (final File fileEntry : Dir.listFiles()) {
+//	  if ( !fileEntry.isDirectory() ){
+//	      
+//		  if(fileEntry.isHidden())
+//			  continue;
+//		  
+//		  System.out.println(fileEntry.getName());
+//	      
+//	      String nextDoc = DocReader.createFileInput(fileEntry);
+//	      processDocument(nextDoc);
+//
+//	      _term_position.clear();
+//	      
+//	      n_doc++;
+//	  } 
+//      }
       
 
 		 
-      /*
+      
 	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
 	  System.out.println("Construct index from: " + corpusFile);
 
@@ -89,7 +94,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	    } finally {
 	      reader.close();
 	    }
-      */	
+      	
       System.out.println(
 			 "Indexed " + Integer.toString(_numDocs) + " docs with " +
 			 Long.toString(_totalTermFrequency) + " terms.");
@@ -327,16 +332,25 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	Vector<Integer> Pt=new Vector<Integer>();
 	
 	
-	
 	int low,high,jump;
 	
 	Pt=_postings.get(_dictionary.get(t));
 	int lt= get_lt(Pt);
 	
+//	System.out.println("Lt: "+Pt.get(lt));
 	
+	
+//	System.out.println("Posting List:");
+//	for(int i=0;i<Pt.size();i++)
+//		System.out.print(Pt.get(i)+" ");
+	
+	
+//	System.out.println("Check infinity");
 	
 	if(lt==-1 || Pt.get(lt)<=current)
 		return Double.POSITIVE_INFINITY;
+	
+//	System.out.println("Check this 1");
 	
 	if(Pt.get(0)>current)
 	{
@@ -344,17 +358,27 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 		return 1.0*Pt.get(c_t);
 	}
 	
-	if(c_t>0 && Pt.get(c_t-1)<=current)
+//	System.out.println("Check this 2");
+	
+	if(c_t>0 && Pt.get(c_t-2)<=current)
 	{
 		c_t=0;
 	}
 	
-	while (Pt.get(c_t)<=current)
+//	System.out.println("before while");
+//	System.out.println("ct: "+c_t);
+//	System.out.println("Pt.get(c_t): "+Pt.get(c_t));
+	
+	while (Pt.get(c_t)<=current && c_t<lt)
 	{
+	
+//		System.out.println("in while");
 		c_t=c_t+2;
+//		System.out.println(c_t);
 	}
 	
-	  
+//	System.out.println("after while");
+	
 	  return 1.0*Pt.get(c_t);
   }
   
@@ -372,6 +396,7 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	  while(true)
 	  {
 		  
+		 
 		 if(pt.get(i+1)==sz-1)
 		 {
 			 return i;
@@ -391,16 +416,17 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	for(int i=0;i<query._tokens.size();i++)
 	{
 		docids.add(i, next(query._tokens.get(i),docid ));
-		c_t=-1;
+		c_t=0;
 		if(docids.get(i)==Double.POSITIVE_INFINITY)
 		{
 			return null;
 		}
 	}
 	
+	
 	if(Collections.max(docids)==Collections.min(docids))
 	{
-		
+		System.out.println("Returned DocID: "+docids.get(0));
 		return _documents.get(docids.get(0).intValue());
 	}
 	

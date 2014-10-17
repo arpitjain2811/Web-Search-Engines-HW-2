@@ -2,9 +2,11 @@ package edu.nyu.cs.cs2580;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.lang.StringBuilder;
 import java.io.File;
 import java.util.regex.Pattern;
@@ -12,9 +14,14 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 
 
-public class ReadCorpus {
+public class ReadCorpus implements Serializable {
 
-    public String createFileInput(final File filename) throws IOException {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4143027004911898369L;
+
+	public String createFileInput(final File filename) throws IOException {
 	StringBuilder out = new StringBuilder();
 	out.append(filename.getName());
 	out.append('\t');
