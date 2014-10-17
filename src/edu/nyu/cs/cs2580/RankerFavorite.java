@@ -36,6 +36,9 @@ class RankerFavorite extends Ranker {
     
     Document i=_indexer.nextDoc(query, -1);
     
+    Document first_pos= _indexer.nextDoc(query,i._docid);
+    
+    
     while(i!=null)
     {
     	System.out.println(i._docid);

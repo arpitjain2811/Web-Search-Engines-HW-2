@@ -17,6 +17,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
 
+
 import edu.nyu.cs.cs2580.SearchEngine.Options;
 
 /**
@@ -415,6 +416,7 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	
 	for(int i=0;i<query._tokens.size();i++)
 	{
+		System.out.println(first_pos(query._tokens.get(i), docid));
 		docids.add(i, next(query._tokens.get(i),docid ));
 		c_t=0;
 		if(docids.get(i)==Double.POSITIVE_INFINITY)
@@ -434,7 +436,177 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	
   }
 
-  @Override
+public double NextPhrase(Query query, int docid,int pos)
+{
+	Document doc=nextDoc(query, docid-1);
+	
+	int doc_verify=doc._docid;
+	
+	if(doc_verify!=docid)
+		return Double.POSITIVE_INFINITY;
+	
+	Vector<Double> pos_vec=new Vector<Double>(query._tokens.size());
+	
+	for(int i=0;i<query._tokens.size();i++)
+	{
+		pos_vec.add(i,next_pos(query._tokens.get(i),docid,pos));
+		
+		if(pos_vec.get(i)==Double.POSITIVE_INFINITY)
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+		
+	}
+		
+	int incr=0;
+	for(int j=0;j<pos_vec.size()-1;j++)
+	{
+		if(pos_vec.get(j)+1==pos_vec.get(j+1))
+		{
+			incr++;
+		}
+				
+	}
+	
+	if(incr==pos_vec.size())
+		return pos_vec.get(0);
+	
+	
+	return NextPhrase(query, docid, Collections.max(pos_vec).intValue());			
+		
+		
+	
+}
+
+  private Double next_pos(String token, int docid, int pos) {
+	// TODO Auto-generated method stub
+	  
+	  Vector<Integer> Pt=_postings.get(_dictionary.get(token));
+	  
+	  int lt=get_lt(Pt);
+	  
+	  
+	  if(lt==-1 || Pt.get(lt)<docid)
+			return Double.POSITIVE_INFINITY;
+	  
+	  int i;
+	  boolean found=false;
+	  
+	  for(i=0;i<=lt;i=i+2)
+	  {
+		  if(Pt.get(i)==docid)
+		  {
+			  found=true;
+			  break;
+		  }
+	  }
+	  
+	  if(found)
+	  {
+		  
+		  i--;
+		  int start_idx= Pt.get(i)+1;
+		  
+		  if(Pt.get(start_idx)!=docid)
+		  {
+			  System.out.println("Something wrong in logic");
+		  }
+		  
+		  int num_occur= Pt.get(start_idx+1);
+		  
+		  start_idx=start_idx+2;
+		  boolean found_pos=false;
+		  int k;
+		  for(k=0;k<num_occur-1;k++)
+		  {
+			  if(Pt.get(start_idx+k)==pos)
+			  {
+				  found_pos=true;
+				  break;
+			  }
+			  
+			  
+		  }
+		  
+		  if(found_pos)
+		  {
+			  return Pt.get(start_idx+k+1)*1.0;
+		  }
+		  else
+			  return Double.POSITIVE_INFINITY;
+		  
+		  
+	  }
+	  
+	  else
+		  return Double.POSITIVE_INFINITY;
+			  
+			  
+	  
+	  
+	
+}
+ public Double first_pos (String token, int docid) {
+	
+Vector<Integer> Pt=_postings.get(_dictionary.get(token));
+	  
+	  int lt=get_lt(Pt);
+	  
+	  
+	  if(lt==-1 || Pt.get(lt)<docid)
+			return Double.POSITIVE_INFINITY;
+	  
+	  int i;
+	  boolean found=false;
+	  
+	  for(i=0;i<=lt;i=i+2)
+	  {
+		  if(Pt.get(i)==docid)
+		  {
+			  found=true;
+			  System.out.println(found);
+			  break;
+		  }
+	  }
+	  
+	  if(found)
+	  {
+		  System.out.println(i);
+		  i--;
+		  int start_idx= Pt.get(i)+1;
+		  System.out.println("Found");
+		  if(Pt.get(start_idx)!=docid)
+		  {
+			  System.out.println("Something wrong in logic");
+		  }
+		  
+		 
+		  System.out.println("Found");
+		  start_idx=start_idx+2;
+		  
+		  
+		  System.out.println("Found");
+		  return (double) Pt.get(start_idx);
+		  
+		  
+	  }
+	  
+	  else
+		  return null;
+
+  
+  
+}
+	  
+	  
+	  
+	 
+	  
+	  
+  
+  
+
+@Override
   public int corpusDocFrequencyByTerm(String term) {
 	  return _dictionary.containsKey(term) ?
 		        _termDocFrequency.get(_dictionary.get(term)) : 0;
