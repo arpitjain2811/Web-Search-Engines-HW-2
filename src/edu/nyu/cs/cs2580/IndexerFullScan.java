@@ -215,8 +215,15 @@ class IndexerFullScan extends Indexer implements Serializable {
         "with " + Long.toString(_totalTermFrequency) + " terms!");
   }
 
-  ///// Serving related functions.
-
+    
+  @Override
+  public double NextPhrase(Query query, int docid, int pos) {
+	SearchEngine.Check(false, "Not implemented!");
+	return 0.0;
+    }
+    
+    ///// Serving related functions.
+    
   @Override
   public Document getDoc(int did) {
     return (did >= _documents.size() || did < 0) ? null : _documents.get(did);

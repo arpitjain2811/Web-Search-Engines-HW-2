@@ -33,23 +33,23 @@ class RankerFavorite extends Ranker {
   public Vector<ScoredDocument> runQuery(Query query, int numResults) {    
     Vector<ScoredDocument> all = new Vector<ScoredDocument>();
     
-    
     Document i=_indexer.nextDoc(query, -1);
     
-    Document first_pos= _indexer.nextDoc(query,i._docid);
-    
-    
     while(i!=null)
-    {
-    	System.out.println(i._docid);
-    	
-    	all.add(scoreDocument(query, i));
-    	
-    	System.out.println("Next Called Doc"+i._docid);
-    	i=_indexer.nextDoc(query,i._docid);
-    	
-    }
-    
+        {
+	    all.add(scoreDocument(query, i));
+	    
+	    System.out.println("Next Called Doc "+i._docid);
+	    
+	    Double position = _indexer.NextPhrase(query, i._docid, -1);
+	    while (position < Double.POSITIVE_INFINITY) {
+		System.out.println("\tPosition: " + position);
+		position = _indexer.NextPhrase(query, i._docid, position.intValue()+1);
+	    }
+	    i=_indexer.nextDoc(query,i._docid);
+	    System.out.println();
+	}
+	    
 
 	
     
@@ -64,7 +64,7 @@ class RankerFavorite extends Ranker {
 
   private ScoredDocument scoreDocument(Query query, Document i) {
     // Process the raw query into tokens.
-    query.processQuery();
+      //    query.processQuery();
 
     // Get the document tokens.
     Document doc = i;

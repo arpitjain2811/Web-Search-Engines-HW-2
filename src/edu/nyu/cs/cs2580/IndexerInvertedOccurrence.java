@@ -404,8 +404,10 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
     private int get_doc_end(Vector<Integer> pt, int docid) {
 
 	int lt = get_lt(pt);
-	if (lt == -1) 
+	if (lt == -1) {
+	    System.out.println("HERE lt pt madness");
 	    return -1;
+	}
 
 	int cur_doc = -1;
 	int i = 0;
@@ -420,6 +422,8 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 		return pt.get(i+1);
 	    }
 	}
+
+	System.out.println("OHHH SHIIIIIIT im here");
 	return -1;
     }
 
@@ -431,7 +435,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	Vector<Double> docids = new Vector<Double>(query._tokens.size());
 	
 	for(int i=0; i<query._tokens.size();i++)
-	{
+	    {
 		docids.add(i, next(query._tokens.get(i),docid ));
 		c_t=0;
 		if(docids.get(i)==Double.POSITIVE_INFINITY)
@@ -443,7 +447,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	if(Collections.max(docids)==Collections.min(docids))
 	{
-		System.out.println("Returned DocID: "+docids.get(0));
 		return _documents.get(docids.get(0).intValue());
 	}
 	
@@ -451,23 +454,27 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
   }
 
+    @Override
 public double NextPhrase(Query query, int docid, int pos)
 {
 	Document doc = nextDoc(query, docid-1);
 	
 	int doc_verify = doc._docid;
-	if(doc_verify!=docid)
-		return Double.POSITIVE_INFINITY;
-	
+	if(doc_verify!=docid) {
+	    return Double.POSITIVE_INFINITY;
+	}
+
 	Vector<Double> pos_vec = new Vector<Double>(query._tokens.size());
-	
-	for(int i=0; i<query._tokens.size(); i++)
-	{
-		pos_vec.add(i,next_pos(query._tokens.get(i), docid, pos));
+
+
+	for(int i=0; i<query._tokens.size(); i++) {
+	    
+	    Double it = next_pos(query._tokens.get(i), docid, pos);
+	    pos_vec.add(i, it);
 		
 		if(pos_vec.get(i) == Double.POSITIVE_INFINITY)
 		{
-			return Double.POSITIVE_INFINITY;
+		    return Double.POSITIVE_INFINITY;
 		}
 		
 	}
@@ -486,9 +493,7 @@ public double NextPhrase(Query query, int docid, int pos)
 		return pos_vec.get(0);
 	
 	
-	return NextPhrase(query, docid, Collections.max(pos_vec).intValue());			
-		
-		
+	return NextPhrase(query, docid, Collections.max(pos_vec).intValue()); 
 	
 }
 
@@ -499,9 +504,9 @@ public double NextPhrase(Query query, int docid, int pos)
 	  
 	  // end of occurrence list for doc
 	  int indx_end = get_doc_end(Pt, docid);
-	  if( indx_end == -1 || Pt.get(indx_end) <= pos)
+	  if( indx_end == -1 || Pt.get(indx_end) <= pos) {
 	      return Double.POSITIVE_INFINITY;
-
+	  }
 	  // get the index of the first position
 	  int indx_start = get_doc_start(Pt, docid);
 	  if (Pt.get(indx_start) > pos)

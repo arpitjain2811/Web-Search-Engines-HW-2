@@ -62,6 +62,8 @@ public abstract class Indexer {
    */
   public abstract Document nextDoc(Query query, int docid);
 
+    public abstract double NextPhrase(Query query, int docid, int pos);
+
   // APIs for index construction and loading.
 
   /**

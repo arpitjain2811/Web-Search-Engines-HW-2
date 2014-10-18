@@ -35,6 +35,16 @@ public class IndexerInvertedCompressed extends Indexer {
     return null;
   }
 
+
+  @Override
+  public double NextPhrase(Query query, int docid, int pos) {
+	SearchEngine.Check(false, "Not implemented!");
+	return 0.0;
+    }
+    
+
+
+
   @Override
   public int corpusDocFrequencyByTerm(String term) {
     return 0;

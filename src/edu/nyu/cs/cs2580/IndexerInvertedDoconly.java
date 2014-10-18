@@ -304,6 +304,14 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
   }
 
   @Override
+  public double NextPhrase(Query query, int docid, int pos) {
+	SearchEngine.Check(false, "Not implemented!");
+	return 0.0;
+    }
+    
+
+
+  @Override
   public int corpusDocFrequencyByTerm(String term) {
 	  return _dictionary.containsKey(term) ?
 		        _termDocFrequency.get(_dictionary.get(term)) : 0;
