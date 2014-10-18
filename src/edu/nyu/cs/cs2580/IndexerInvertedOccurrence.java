@@ -24,271 +24,242 @@ import edu.nyu.cs.cs2580.SearchEngine.Options;
  * @CS2580: Implement this class for HW2.
  */
 public class IndexerInvertedOccurrence extends Indexer implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1626440145434710491L;
-
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1626440145434710491L;
+    
     private ReadCorpus DocReader = new ReadCorpus();
-
-	private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
-//	private Vector<String> _terms = new Vector<String>();
-	private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
-	private Vector<Document> _documents=new Vector<Document>();
+    
+    private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
+    //	private Vector<String> _terms = new Vector<String>();
+    private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
+    private Vector<Document> _documents=new Vector<Document>();
+    
+    private Map<Integer, Integer> _termCorpusFrequency =
+	new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> _termDocFrequency =
+	new HashMap<Integer, Integer>();
+    private Integer c_t=-1;
+    private HashMap<Integer,Vector<Integer>> _term_position = new HashMap<Integer,Vector<Integer>>();
+    private HashMap<Integer,Vector<Integer>> _skip_pointer=new HashMap<Integer,Vector<Integer>>();
+    private HashMap<Integer,Vector<Integer>> _term_list=new HashMap<Integer,Vector<Integer>>();
+    
+    public IndexerInvertedOccurrence(Options options) {
+	super(options);
+	System.out.println("Using Indexer: " + this.getClass().getSimpleName());
+    }
+    
+    public void constructIndex() throws IOException {
 	
-	private Map<Integer, Integer> _termCorpusFrequency =
-		      new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> _termDocFrequency =
-		      new HashMap<Integer, Integer>();
-	private Integer c_t=-1;
-	private HashMap<Integer,Vector<Integer>> _term_position = new HashMap<Integer,Vector<Integer>>();
-	private HashMap<Integer,Vector<Integer>> _skip_pointer=new HashMap<Integer,Vector<Integer>>();
-	private HashMap<Integer,Vector<Integer>> _term_list=new HashMap<Integer,Vector<Integer>>();
+	//      String corpusDir = _options._corpusPrefix;
+	//      System.out.println("Constructing index documents in: " + corpusDir);
+	//
+	//      final File Dir = new File(corpusDir);
+	//      int n_doc = 0;
+	//      for (final File fileEntry : Dir.listFiles()) {
+	//	  if ( !fileEntry.isDirectory() ){
+	//	      
+	//		  if(fileEntry.isHidden())
+	//			  continue;
+	//		  
+	//		  System.out.println(fileEntry.getName());
+	//	      
+	//	      String nextDoc = DocReader.createFileInput(fileEntry);
+	//	      processDocument(nextDoc);
+	//
+	//	      _term_position.clear();
+	//	      
+	//	      n_doc++;
+	//	  } 
+	//      }
 	
-  public IndexerInvertedOccurrence(Options options) {
-    super(options);
-    System.out.println("Using Indexer: " + this.getClass().getSimpleName());
-  }
-
-  public void constructIndex() throws IOException {
-
-//      String corpusDir = _options._corpusPrefix;
-//      System.out.println("Constructing index documents in: " + corpusDir);
-//
-//      final File Dir = new File(corpusDir);
-//      int n_doc = 0;
-//      for (final File fileEntry : Dir.listFiles()) {
-//	  if ( !fileEntry.isDirectory() ){
-//	      
-//		  if(fileEntry.isHidden())
-//			  continue;
-//		  
-//		  System.out.println(fileEntry.getName());
-//	      
-//	      String nextDoc = DocReader.createFileInput(fileEntry);
-//	      processDocument(nextDoc);
-//
-//	      _term_position.clear();
-//	      
-//	      n_doc++;
-//	  } 
-//      }
-      
-
-		 
-      
+	
+	
+	
 	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
 	  System.out.println("Construct index from: " + corpusFile);
-
+	  
 	  int n_doc=0;
-	    BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
-	    try {
+	  BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
+	  try {
 	      String line = null;
 	      while ((line = reader.readLine()) != null) {
-	    	System.out.println("Document"+n_doc);
-	        processDocument(line);
-	        _term_position.clear();
-	       
-	        n_doc++;
+		  System.out.println("Document"+n_doc);
+		  processDocument(line);
+		  _term_position.clear();
+		  
+		  n_doc++;
 	      }
-	    } finally {
+	  } finally {
 	      reader.close();
-	    }
-      	
-      System.out.println(
-			 "Indexed " + Integer.toString(_numDocs) + " docs with " +
-			 Long.toString(_totalTermFrequency) + " terms.");
-      
-      String indexFile = _options._indexPrefix + "/corpus.idx";
-      System.out.println("Store index to: " + indexFile);
-      ObjectOutputStream writer =
-	  new ObjectOutputStream(new FileOutputStream(indexFile));
-      
-      Vector<Integer> list=new Vector<Integer>();
-      Vector<Integer> skip=new Vector<Integer>();
-      Vector<Integer> posting=new Vector<Integer>();
-      
-      
-      System.out.print("Dic");
-      for(int i: _dictionary.values())
-	  {
-	      list=_term_list.get(i);
-	      skip=_skip_pointer.get(i);
-	      
-	      posting= update_skip(skip,skip.size());
-	      posting.addAll(list);
-	      _postings.put(i, posting);
-	      
 	  }
-      
-      
-      System.out.print("Dic");
-      _term_list=null;
-      _skip_pointer=null;
-      _term_position=null;
-      
-      writer.writeObject(this);
-      writer.close();
-      
-  }
+	  
+	  System.out.println(
+			     "Indexed " + Integer.toString(_numDocs) + " docs with " +
+			     Long.toString(_totalTermFrequency) + " terms.");
+	  
+	  String indexFile = _options._indexPrefix + "/corpus.idx";
+	  System.out.println("Store index to: " + indexFile);
+	  ObjectOutputStream writer =
+	      new ObjectOutputStream(new FileOutputStream(indexFile));
 
-  private Vector<Integer> update_skip(Vector<Integer> skip, int size) {
+	  // temporary vectors
+	  Vector<Integer> list = new Vector<Integer>();
+	  Vector<Integer> skip = new Vector<Integer>();
+	  Vector<Integer> posting = new Vector<Integer>();
+	  
+	  // ***** //
+	  System.out.print("Dic");
+	  for(int i : _dictionary.values())
+	      {
+		  // get the term position list and skip pointer
+		  list =_term_list.get(i);
+		  skip = _skip_pointer.get(i);
+		  
+		  // create final posting for term
+		  posting = update_skip(skip,skip.size());
+		  posting.addAll(list);
+		  _postings.put(i, posting);
+		  
+	      }
+	  
+	  
+	  System.out.print("Dic");
+	  _term_list=null;
+	  _skip_pointer=null;
+	  _term_position=null;
+	  
+	  writer.writeObject(this);
+	  writer.close();
+	  
+    }
+    
+    private Vector<Integer> update_skip(Vector<Integer> skip, int size) {
 	// TODO Auto-generated method stub
-	  
-	  for(int i=0;i<skip.size();i++)
-	  {
-		  if(i%2!=0)
-		  {
-			  skip.set(i, skip.get(i)+size);
-		  }
-	  }
-	  
+ 
+	// add list size to each index per document
+	for(int i = 0; i < skip.size(); i++) {
+	    if(i % 2 != 0) {
+		skip.set(i, skip.get(i)+size);
+	    }
+	}
 	return skip;
-}
-
-private void processDocument(String content) {
+    }
+    
+    private void processDocument(String content) {
 	// TODO Auto-generated method stub
-	  
-	  Scanner s = new Scanner(content).useDelimiter("\t");
-
-	  
-	    String title = s.next();
-	    Vector<Integer> titleTokens = new Vector<Integer>();
-	    
-	    readTermVector(title, titleTokens);
-
-	    Vector<Integer> bodyTokens = new Vector<Integer>();
-	    
-	    readTermVector(s.next(), bodyTokens);
-	    
-	    
-	    int numViews = Integer.parseInt(s.next());
-	    s.close();
-
-	    
-		DocumentIndexed doc = new DocumentIndexed(_documents.size());
-	    
-		
-		doc.setTitle(title);
-	    doc.setNumViews(numViews);
-	    
-	    _documents.add(doc); 
-	  
-	    _numDocs++;
-	    
-	    Set<Integer> uniqueTerms = new HashSet<Integer>();
-	    
-	    updateStatistics(titleTokens, uniqueTerms);
-	    
-	    updateStatistics(bodyTokens, uniqueTerms);
-	    
-	   
-	    Vector<Integer> positions=new Vector<Integer>();
-	    Vector<Integer> list=new Vector<Integer>();
-	    Vector<Integer> skip=new Vector<Integer>();
-	    
-	    
-	    for (Integer idx : uniqueTerms) {
-	      _termDocFrequency.put(idx, _termDocFrequency.get(idx) + 1);
-
-	      
-	      
-	      skip=_skip_pointer.get(idx);
-	      
-	      list=_term_list.get(idx);
-	      
-	      positions=_term_position.get(idx);
-	      
-
-	      list.add(_documents.size()-1);
-	      list.add(positions.size());
-	      
-
-	      
-	      list.addAll(positions);
-	      
-	      skip.add(_documents.size()-1);
-	      skip.add(list.size()-1);
-	      
-	      _skip_pointer.put(idx, skip);
-	      _term_list.put(idx, list);
-	      
-	    
-	      
-	    }
-	    
-	    
 	
-}
+	Scanner s = new Scanner(content).useDelimiter("\t");
+	Set<Integer> uniqueTerms = new HashSet<Integer>();
+
+	// pass the title 
+	String title = s.next();
+	readTermVector(title, uniqueTerms);
+	
+	// pass the body
+	readTermVector(s.next(), uniqueTerms);
+	
+	// get number of views
+	int numViews = Integer.parseInt(s.next());
+	s.close();
+	
+	// create the document
+	DocumentIndexed doc = new DocumentIndexed(_documents.size());
+	doc.setTitle(title);
+	doc.setNumViews(numViews);
+	
+	// add the document
+	_documents.add(doc); 
+	_numDocs++;
+	
+	// create postings lists and skip pointers
+	Vector<Integer> positions=new Vector<Integer>();
+	Vector<Integer> list=new Vector<Integer>();
+	Vector<Integer> skip=new Vector<Integer>();
+	for (Integer idx : uniqueTerms) {
+	    // increase number of docs this term appears in
+	    _termDocFrequency.put(idx, _termDocFrequency.get(idx) + 1);
+
+	    // get the vectors
+	    skip = _skip_pointer.get(idx);
+	    list = _term_list.get(idx);
+	    positions = _term_position.get(idx);
+	    
+	    // add document ID
+	    list.add(_documents.size()-1);
+	    // add number of occurrences
+	    list.add(positions.size());
+	    // add all the positions in the document
+	    list.addAll(positions);
+	    
+	    // add document ID
+	    skip.add(_documents.size()-1);
+	    // add how far to skip to the last element of this documents list
+	    skip.add(list.size()-1);
+	    
+	    // set it
+	    _skip_pointer.put(idx, skip);
+	    _term_list.put(idx, list);
+	    
+	}
+	
+    }
   
-  private void readTermVector(String content, Vector<Integer> tokens) {
-	    Scanner s = new Scanner(content);  // Uses white space by default.
-	    int pos=0;
-	    Vector<Integer> positions=new Vector<Integer>();
-	    while (s.hasNext()) {
-	       
-	      String token = s.next();
-	      int idx = -1;
-	   
-	      
-	      
-	      if (_dictionary.containsKey(token)) {
-	        idx = _dictionary.get(token);
-	        
-	        
-	        
-	        if(!_term_position.containsKey(idx))
-	        {
-	        	_term_position.put(idx, new Vector<Integer>());
-		        
-	        }
-	        
-	        positions=_term_position.get(idx);
-	        positions.add(pos);
-	        
-	        _term_position.put(idx, positions);
-	        
-	        
-	      } else {
-	    	 
-	        idx =_dictionary.size();
-//	        _terms.add(token);
-	        if(idx==132)
-	        	System.out.println(token);
-	        _dictionary.put(token, idx);
-	        
+    private void readTermVector(String content, Set <Integer> uniques) {
+	Scanner s = new Scanner(content);  // Uses white space by default.
+	int pos = 0;
+	Vector<Integer> positions = new Vector<Integer>();
+	while (s.hasNext()) {
+	    
+	    String token = s.next();
+	    int idx = -1;
+	    
+	    // get index from the dictionary or add it
+	    if (!_dictionary.containsKey(token)) {
+		idx = _dictionary.size();
+		_dictionary.put(token, idx);
+		
 	        _termCorpusFrequency.put(idx, 0);
 	        _termDocFrequency.put(idx, 0);
-	        
-	        
-	        
-	        
-	        
-	        _skip_pointer.put(idx, new Vector<Integer>());
-	        _term_list.put(idx, new Vector<Integer>());
-	        _term_position.put(idx, new Vector<Integer>());
-	        positions=_term_position.get(idx);
-	        positions.add(pos);
-	        _term_position.put(idx, positions);
-	        
-	        _postings.put(idx,new Vector<Integer>());
-	      }
-	      tokens.add(idx);
-	      pos++;
-	     
+	
+		// create these things for new word
+		_skip_pointer.put(idx, new Vector<Integer>());
+		_term_list.put(idx, new Vector<Integer>());
+		_term_position.put(idx, new Vector<Integer>());
+		_postings.put(idx,new Vector<Integer>());
+	
+	    } else {
+		idx = _dictionary.get(token);
 	    }
-	    return;
-	  }
-	  
-  
-private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
-   for (int idx : tokens) {
-     uniques.add(idx);
-     _termCorpusFrequency.put(idx, _termCorpusFrequency.get(idx) + 1);
-     ++_totalTermFrequency;
-   }
- }
+	    
+	    // make sure term is in term_position
+	    if (!_term_position.containsKey(idx)) {
+		_term_position.put(idx, new Vector<Integer>() );
+	    }
+
+	    // ***** //
+	    if(idx==132)
+		System.out.println(token);
+
+	    // add position of the term
+	    positions = _term_position.get(idx);
+	    positions.add(pos);
+	    _term_position.put(idx, positions);
+
+	    // add term to the unique set
+	    uniques.add(idx);
+	    
+	    // update stats
+	    _termCorpusFrequency.put(idx, _termCorpusFrequency.get(idx) + 1);
+	    ++_totalTermFrequency;
+
+	    pos++;
+	}
+	return;
+    }
+    
   
 @Override
   public void loadIndex() throws IOException, ClassNotFoundException {
@@ -389,6 +360,7 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	  int sz=pt.size();
 	  int i=0;
 	  
+	  // return -1 if no doc present
 	  if(pt.size()==0)
 	  {
 		  return -1;
@@ -397,15 +369,65 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	  while(true)
 	  {
 		  
-		 
-		 if(pt.get(i+1)==sz-1)
-		 {
-			 return i;
+	      // return the index of the last doc in skip pointer list
+	      if(pt.get(i+1)==sz-1)
+		  {
+		      return i;
 		 }
-		 
-		 i=i+2;
+	      
+	      i=i+2;
 	  }
 }
+
+
+    private int get_doc_start(Vector<Integer> pt, int docid) {
+
+	int lt = get_lt(pt);
+	if (lt == -1) 
+	    return -1;
+
+	int cur_doc = -1;
+	int i = 0;
+	// find the doc id in skip pointer list
+	while (i <= lt) {
+	    cur_doc = pt.get(i);
+	    // did not find, continue
+	    if (cur_doc != docid) {
+		i += 2;
+	    } else {
+		// if it was the first doc
+		// skip over ptr_indx, docid, num_occ
+		if (i == 0)
+		    return lt + 4;
+		else 
+		    // go to prev doc ptr, jump, then skip docid, num_occ
+		    return pt.get(i - 1) + 3;
+	    }
+	}
+	return -1;
+    }
+
+    private int get_doc_end(Vector<Integer> pt, int docid) {
+
+	int lt = get_lt(pt);
+	if (lt == -1) 
+	    return -1;
+
+	int cur_doc = -1;
+	int i = 0;
+	// find the doc id in skip pointer list
+	while (i <= lt) {
+	    cur_doc = pt.get(i);
+	    // did not find, continue
+	    if (cur_doc != docid) {
+		i += 2;
+	    } else {
+		// found, return end position of the occurrences list for that doc
+		return pt.get(i+1);
+	    }
+	}
+	return -1;
+    }
 
 
  
@@ -414,7 +436,7 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
    
 	Vector<Double> docids = new Vector<Double>(query._tokens.size());
 	
-	for(int i=0;i<query._tokens.size();i++)
+	for(int i=0; i<query._tokens.size();i++)
 	{
 		System.out.println(first_pos(query._tokens.get(i), docid));
 		docids.add(i, next(query._tokens.get(i),docid ));
@@ -436,39 +458,38 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	
   }
 
-public double NextPhrase(Query query, int docid,int pos)
+public double NextPhrase(Query query, int docid, int pos)
 {
-	Document doc=nextDoc(query, docid-1);
+	Document doc = nextDoc(query, docid-1);
 	
-	int doc_verify=doc._docid;
-	
+	int doc_verify = doc._docid;
 	if(doc_verify!=docid)
 		return Double.POSITIVE_INFINITY;
 	
-	Vector<Double> pos_vec=new Vector<Double>(query._tokens.size());
+	Vector<Double> pos_vec = new Vector<Double>(query._tokens.size());
 	
-	for(int i=0;i<query._tokens.size();i++)
+	for(int i=0; i<query._tokens.size(); i++)
 	{
-		pos_vec.add(i,next_pos(query._tokens.get(i),docid,pos));
+		pos_vec.add(i,next_pos(query._tokens.get(i), docid, pos));
 		
-		if(pos_vec.get(i)==Double.POSITIVE_INFINITY)
+		if(pos_vec.get(i) == Double.POSITIVE_INFINITY)
 		{
 			return Double.POSITIVE_INFINITY;
 		}
 		
 	}
 		
-	int incr=0;
-	for(int j=0;j<pos_vec.size()-1;j++)
+	int incr = 1;
+	for(int j=0; j<pos_vec.size()-1; j++)
 	{
-		if(pos_vec.get(j)+1==pos_vec.get(j+1))
+		if(pos_vec.get(j)+1 == pos_vec.get(j+1))
 		{
 			incr++;
 		}
 				
 	}
 	
-	if(incr==pos_vec.size())
+	if(incr == pos_vec.size())
 		return pos_vec.get(0);
 	
 	
@@ -481,24 +502,38 @@ public double NextPhrase(Query query, int docid,int pos)
   private Double next_pos(String token, int docid, int pos) {
 	// TODO Auto-generated method stub
 	  
-	  Vector<Integer> Pt=_postings.get(_dictionary.get(token));
+	  Vector<Integer> Pt = _postings.get(_dictionary.get(token));
 	  
-	  int lt=get_lt(Pt);
+	  // end of occurrence list for doc
+	  int indx_end = get_doc_end(Pt, docid);
+	  if( indx_end == -1 || Pt.get(indx_end) <= pos)
+	      return Double.POSITIVE_INFINITY;
+
+	  // get the index of the first position
+	  int indx_start = get_doc_start(Pt, docid);
+	  if (Pt.get(indx_start) > pos)
+	      return 1.0 * Pt.get(indx_start);
+
+	  // iterate through position list until you pass current position
+	  int i = indx_start;
+	  for(; Pt.get(i) < pos; i++);
+
+	  // return that next position
+	  return 1.0 * Pt.get(i);
 	  
-	  
-	  if(lt==-1 || Pt.get(lt)<docid)
-			return Double.POSITIVE_INFINITY;
-	  
-	  int i;
+
+
+	  /*
+	    int i;
 	  boolean found=false;
 	  
 	  for(i=0;i<=lt;i=i+2)
 	  {
-		  if(Pt.get(i)==docid)
-		  {
-			  found=true;
-			  break;
-		  }
+	  if(Pt.get(i)==docid)
+	  {
+	  found=true;
+	  break;
+	  }
 	  }
 	  
 	  if(found)
@@ -539,13 +574,12 @@ public double NextPhrase(Query query, int docid,int pos)
 	  }
 	  
 	  else
-		  return Double.POSITIVE_INFINITY;
-			  
-			  
+	  return Double.POSITIVE_INFINITY			  
+	  */ 
 	  
 	  
-	
-}
+  }
+
  public Double first_pos (String token, int docid) {
 	
 Vector<Integer> Pt=_postings.get(_dictionary.get(token));
