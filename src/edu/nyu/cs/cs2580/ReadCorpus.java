@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.lang.StringBuilder;
+import java.util.Scanner;
 import java.io.File;
 import java.util.regex.Pattern;
 import java.io.InputStream;
@@ -15,13 +16,30 @@ import java.io.ByteArrayInputStream;
 
 
 public class ReadCorpus implements Serializable {
-
+    
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4143027004911898369L;
+     * 
+     */
+    private static final long serialVersionUID = 4143027004911898369L;
 
-	public String createFileInput(final File filename) throws IOException {
+    // for test corpus
+    public String createFileInput(String content) throws IOException {
+	StringBuilder out = new StringBuilder();
+	Scanner s = new Scanner(content).useDelimiter("\t");
+	String title = s.next();
+	String body = cleanAndStem(s.next());
+
+	out.append(title);
+	out.append('\t');
+	out.append(body);
+	out.append('\t');
+	out.append(s.next());
+
+	return out.toString();
+    }
+    
+    // for wiki text
+    public String createFileInput(final File filename) throws IOException {
 	StringBuilder out = new StringBuilder();
 	out.append(filename.getName());
 	out.append('\t');
@@ -45,7 +63,7 @@ public class ReadCorpus implements Serializable {
 	return everything.toString();
     }    
 
-    private String cleanAndStem(String body) throws IOException {
+    public String cleanAndStem(String body) throws IOException {
 	body = body.replaceAll("-", " ");
 	body = body.replaceAll("\\s+", " ");
 	String charsToDel = "`~!@#$%^&*()_+=[]\\{}|;':\",./<>?";
