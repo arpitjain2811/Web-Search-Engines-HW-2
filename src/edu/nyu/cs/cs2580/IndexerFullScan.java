@@ -71,9 +71,35 @@ class IndexerFullScan extends Indexer implements Serializable {
       final File Dir = new File(corpusDir);
       for (final File fileEntry : Dir.listFiles()) {
 	  if ( !fileEntry.isDirectory() ){
-	      System.out.println(fileEntry.getName());
-	      String nextDoc = DocReader.createFileInput(fileEntry);
-	      processDocument(nextDoc);
+	      
+	      // dont read hidden files
+	      if(fileEntry.isHidden())
+		  continue;
+	    
+	      // special case for testing with corpus.tsv
+	      if (fileEntry.getName().endsWith("corpus.tsv") ) {
+		  System.out.println(fileEntry.getName());
+		  BufferedReader reader = new BufferedReader(new FileReader(fileEntry));
+		  try {
+		      String line = null;
+		      while ((line = reader.readLine()) != null) {
+			  System.out.println("Document" + n_doc);
+			  line = DocReader.createFileInput(line);
+			  processDocument(line);
+			  _term_position.clear();
+			  
+			  n_doc++;
+		      }
+		  } 
+		  finally {
+		      reader.close();
+		  }
+	      }
+	      else {
+		  System.out.println(fileEntry.getName());
+		  String nextDoc = DocReader.createFileInput(fileEntry);
+		  processDocument(nextDoc);
+	      }
 	  } 
       }
 
