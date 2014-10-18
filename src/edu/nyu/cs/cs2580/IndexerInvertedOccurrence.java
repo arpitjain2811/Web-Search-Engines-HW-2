@@ -110,8 +110,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	  Vector<Integer> skip = new Vector<Integer>();
 	  Vector<Integer> posting = new Vector<Integer>();
 	  
-	  // ***** //
-	  System.out.print("Dic");
 	  for(int i : _dictionary.values())
 	      {
 		  // get the term position list and skip pointer
@@ -126,7 +124,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	      }
 	  
 	  
-	  System.out.print("Dic");
 	  _term_list=null;
 	  _skip_pointer=null;
 	  _term_position=null;
@@ -239,9 +236,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 		_term_position.put(idx, new Vector<Integer>() );
 	    }
 
-	    // ***** //
-	    if(idx==132)
-		System.out.println(token);
 
 	    // add position of the term
 	    positions = _term_position.get(idx);
@@ -438,7 +432,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	for(int i=0; i<query._tokens.size();i++)
 	{
-		System.out.println(first_pos(query._tokens.get(i), docid));
 		docids.add(i, next(query._tokens.get(i),docid ));
 		c_t=0;
 		if(docids.get(i)==Double.POSITIVE_INFINITY)
