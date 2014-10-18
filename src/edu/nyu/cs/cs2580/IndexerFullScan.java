@@ -69,6 +69,7 @@ class IndexerFullScan extends Indexer implements Serializable {
       System.out.println("Constructing index documents in: " + corpusDir);
 
       final File Dir = new File(corpusDir);
+      int n_doc=0;
       for (final File fileEntry : Dir.listFiles()) {
 	  if ( !fileEntry.isDirectory() ){
 	      
@@ -86,7 +87,6 @@ class IndexerFullScan extends Indexer implements Serializable {
 			  System.out.println("Document" + n_doc);
 			  line = DocReader.createFileInput(line);
 			  processDocument(line);
-			  _term_position.clear();
 			  
 			  n_doc++;
 		      }
