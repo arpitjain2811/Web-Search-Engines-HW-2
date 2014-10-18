@@ -73,7 +73,6 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 			  line = DocReader.createFileInput(line);
 			  processDocument(line);
 			  
-			  
 			  n_doc++;
 		      }
 		  } 
@@ -82,7 +81,8 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 		  }
 	      }
 	      else {
-		  System.out.println(fileEntry.getName());
+		  System.out.println(n_doc+" "+ fileEntry.getName());
+		  n_doc++;
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
 	      }
