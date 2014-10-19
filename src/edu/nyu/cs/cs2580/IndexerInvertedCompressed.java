@@ -31,6 +31,7 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	    private ReadCorpus DocReader = new ReadCorpus();
 	    
 	    private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
+	    private Map<String, Vector<Integer>> _decoded = new HashMap<String, Vector<Integer>>();
 	    private HashMap<Integer, Integer> elias = new HashMap<Integer,Integer>();
 	    private HashMap<Integer, BitSet > _postings=new HashMap<Integer,BitSet>();
 	    private Vector<Document> _documents=new Vector<Document>();
@@ -423,6 +424,9 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	    for (Integer freq : loaded._termCorpusFrequency.values())
 		this._totalTermFrequency += freq;
 
+	   
+	    
+	    
 	this._postings = loaded._postings;
 	this._dictionary = loaded._dictionary;
 	this._termCorpusFrequency = loaded._termCorpusFrequency;
@@ -448,10 +452,10 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
  private Double next(String t, Integer current) {
 	
 	// get the postings list
-	BitSet b = _postings.get(_dictionary.get(t));
 	
 	
-	Vector<Integer> Pt=Elias_decode(b,t);
+	
+	Vector<Integer> Pt=_decoded.get(t);
 	
 
 	
@@ -484,6 +488,13 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 public Document nextDoc(Query query, int docid) {
 	
 	Vector<Double> docids = new Vector<Double>(query._tokens.size());
+	
+	for(int i=0;i<query._tokens.size();i++)
+	{
+		if(!_decoded.containsKey(query._tokens.get(i)))
+		_decoded.put(query._tokens.get(i), Elias_decode(_postings.get(_dictionary.get(query._tokens.get(i))), query._tokens.get(i)));
+			
+	}
 	
 	// get next doc for each term in query
 	for(int i = 0; i < query._tokens.size(); i++) {
@@ -614,9 +625,7 @@ public double NextPhrase(Query query, int docid, int pos) {
 private Double next_pos(String token, int docid, int pos) {
 	// TODO Auto-generated method stub
 	
-	BitSet b = _postings.get(_dictionary.get(token));
-	
-	Vector<Integer> Pt=Elias_decode(b,token);
+	Vector<Integer> Pt=_decoded.get(token);
 	
 	// end of occurrence list for doc
 	int indx_end = get_doc_end(Pt, docid);
@@ -696,9 +705,7 @@ private Double next_pos(String token, int docid, int pos) {
 
 public Double first_pos (String token, int docid) {
 	
-BitSet b = _postings.get(_dictionary.get(token));
-	
-	Vector<Integer> Pt=Elias_decode(b,token);
+	Vector<Integer> Pt=_decoded.get(token);
 	  
 	  int lt=get_lt(Pt);
 	  
