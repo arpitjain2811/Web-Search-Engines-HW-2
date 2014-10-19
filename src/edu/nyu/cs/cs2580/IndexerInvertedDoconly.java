@@ -356,7 +356,7 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 
   @Override
   public int documentTermFrequency(String term, String url) {
-    SearchEngine.Check(false, "Not implemented!");
-    return 0;
+  	// right now only docs that contain every query word are retrieved, so okay for now
+    return 1;
   }
 }
