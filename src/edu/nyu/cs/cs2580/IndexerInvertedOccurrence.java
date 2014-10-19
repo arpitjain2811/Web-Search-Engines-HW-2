@@ -184,7 +184,8 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	DocumentIndexed doc = new DocumentIndexed(_documents.size());
 	doc.setTitle(title);
 	doc.setNumViews(numViews);
-	
+	//	doc.setNumTerms(numTerms);
+
 	// add the document
 	_documents.add(doc); 
 	_numDocs++;
