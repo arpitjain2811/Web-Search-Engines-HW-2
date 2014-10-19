@@ -51,12 +51,10 @@ class RankerFavorite extends Ranker {
 
   private ScoredDocument scoreDocument(Query query, Document document) {
 
-    // Get the document tokens.
-    Document doc = document;
-    
-    double title_score = runquery_title(query, doc);
+    double title_score = runquery_title(query, document);
+    double cosine_score = runquery_cosine(query, document)
 
-    double score = title_score;
+    double score = title_score + cosine_score;
 
     return new ScoredDocument(doc, score);
   }
