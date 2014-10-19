@@ -772,7 +772,7 @@ public Double first_pos (String token, int docid) {
   public int documentTermFrequency(String term, String did) {
   	int docid = Integer.parseInt(did);
   	if (_dictionary.containsKey(term)) {
-  		Vector<Integer> Pt_decoded.get(term);
+  		Vector<Integer> Pt = _decoded.get(term);
 	  	// index for positions of term in the doc
 		int positions_indx = get_doc_start(Pt, docid);
 		return positions_indx != -1 ? Pt.get(positions_indx - 1) : 0;
