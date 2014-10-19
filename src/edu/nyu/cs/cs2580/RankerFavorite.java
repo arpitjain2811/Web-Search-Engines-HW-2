@@ -23,8 +23,7 @@ import edu.nyu.cs.cs2580.SearchEngine.Options;
  */
 class RankerFavorite extends Ranker {
 
-  public RankerFavorite(Options options,
-      CgiArguments arguments, Indexer indexer) {
+  public RankerFavorite(Options options, CgiArguments arguments, Indexer indexer) {
     super(options, arguments, indexer);
     System.out.println("Using Ranker: " + this.getClass().getSimpleName());
   }
@@ -33,26 +32,14 @@ class RankerFavorite extends Ranker {
   public Vector<ScoredDocument> runQuery(Query query, int numResults) {    
     Vector<ScoredDocument> all = new Vector<ScoredDocument>();
     
-    Document i=_indexer.nextDoc(query, -1);
+    Document i = _indexer.nextDoc(query, -1);
     
-    while(i!=null)
-        {
-	    all.add(scoreDocument(query, i));
-	    
-	    System.out.println("Next Called Doc "+i._docid);
-	    
-	    Double position = _indexer.NextPhrase(query, i._docid, -1);
-	    while (position < Double.POSITIVE_INFINITY) {
-		System.out.println("\tPosition: " + position);
-		position = _indexer.NextPhrase(query, i._docid, position.intValue()+1);
-	    }
-	    i=_indexer.nextDoc(query,i._docid);
-	    System.out.println();
-	}
-	    
+    while(i != null) {
+      System.out.println("Next Called Doc "+i._docid);
 
-	
-    
+      all.add(scoreDocument(query, i));
+	    i = _indexer.nextDoc(query,i._docid);
+    }
     
     Collections.sort(all, Collections.reverseOrder());
     Vector<ScoredDocument> results = new Vector<ScoredDocument>();
@@ -62,33 +49,48 @@ class RankerFavorite extends Ranker {
     return results;
   }
 
-  private ScoredDocument scoreDocument(Query query, Document i) {
-    // Process the raw query into tokens.
-      //    query.processQuery();
+  private ScoredDocument scoreDocument(Query query, Document document) {
 
     // Get the document tokens.
-    Document doc = i;
+    Document doc = document;
     
-    String docTokens = ((DocumentIndexed) doc).getTitle();
+    double title_score = runquery_title(query, doc);
 
-    
-    Vector<String> dToken=new Vector<String>(Arrays.asList(docTokens.split(" ")));
-    
-    // Score the document. Here we have provided a very simple ranking model,
-    // where a document is scored 1.0 if it gets hit by at least one query term.
-    double score = 0.0;
-    for (String docToken : dToken) {
-      for (String queryToken : query._tokens) {
-        if (docToken.equals(queryToken)) {
-          score += 1.0;
-          
-        }
-      }
-      if (score > 0.0) {
-        break;
-      }
-    }
+    double score = title_score;
+
     return new ScoredDocument(doc, score);
   }
+
+  private double runquery_title(Query query, Document doc) {
+    String title = ((DocumentIndexed) doc).getTitle();
+    Vector<String> titleTokens = new Vector<String>( Arrays.asList(title.split(" ")) );    
+
+    double size = (double) query._tokens.size();
+    titleTokens.retainAll(query._tokens); 
+    double score = titleTokens.size() / size;
+
+    return score;
+  }
+
+  private double runquery_cosine(Query query, Document doc) {
+    double score = 0.0;
+    // total number of docs, from indexer
+    int num_docs = _indexer.numDocs();
+
+    for (String queryToken : query._tokens){
+
+      // number of occurrences of this term, from postings list
+      int tf = _indexer.documentTermFrequency(queryToken, Integer.toString(doc._docid) );
+      // number of docs word is in, from indexer
+      int df = _indexer.corpusTermFrequency(queryToken);
+
+      double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
+      score += tf * idf;
+    }
+
+    return score;
+  }
+
 }
+
 
