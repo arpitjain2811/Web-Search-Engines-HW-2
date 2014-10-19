@@ -9,9 +9,21 @@ import java.util.Vector;
 public class DocumentIndexed extends Document {
   private static final long serialVersionUID = 9184892508124423115L;
 
+    //    private int _numTerms = 0;
+
   public DocumentIndexed(int docid) {
     super(docid);
   }
+
+    /*
+    public void setNumTerms(int num){
+	_numTerms = num;
+    }
+
+    public int getNumTerms(){
+	return _numTerms;
+    };
+    */
 }
 
 

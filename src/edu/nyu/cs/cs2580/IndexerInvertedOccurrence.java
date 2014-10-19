@@ -184,7 +184,8 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	DocumentIndexed doc = new DocumentIndexed(_documents.size());
 	doc.setTitle(title);
 	doc.setNumViews(numViews);
-	
+	//	doc.setNumTerms(numTerms);
+
 	// add the document
 	_documents.add(doc); 
 	_numDocs++;
@@ -572,8 +573,14 @@ Vector<Integer> Pt=_postings.get(_dictionary.get(token));
   }
 
   @Override
-  public int documentTermFrequency(String term, String url) {
-    SearchEngine.Check(false, "Not implemented!");
+  public int documentTermFrequency(String term, String did) {
+  	int docid = Integer.parseInt(did);
+  	if (_dictionary.containsKey(term)) {
+	  	Vector<Integer> Pt = _postings.get( _dictionary.get(term) );
+	  	// index for positions of term in the doc
+		int positions_indx = get_doc_start(Pt, docid);
+		return positions_indx != -1 ? Pt.get(positions_indx - 1) : 0;
+  	}
     return 0;
   }
 }
