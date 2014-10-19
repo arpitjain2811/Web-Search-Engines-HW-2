@@ -52,11 +52,11 @@ class RankerFavorite extends Ranker {
   private ScoredDocument scoreDocument(Query query, Document document) {
 
     double title_score = runquery_title(query, document);
-    double cosine_score = runquery_cosine(query, document)
+    double cosine_score = runquery_cosine(query, document);
 
     double score = title_score + cosine_score;
 
-    return new ScoredDocument(doc, score);
+    return new ScoredDocument(document, score);
   }
 
   private double runquery_title(Query query, Document doc) {
