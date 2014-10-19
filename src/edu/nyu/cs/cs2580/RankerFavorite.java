@@ -39,15 +39,15 @@ class RankerFavorite extends Ranker {
         {
 	    all.add(scoreDocument(query, i));
 	    
-	    System.out.println("Next Called Doc "+i._docid);
+	    //System.out.println("Next Called Doc "+i._docid);
 	    
 	    Double position = _indexer.NextPhrase(query, i._docid, -1);
 	    while (position < Double.POSITIVE_INFINITY) {
-		System.out.println("\tPosition: " + position);
+		//System.out.println("\tPosition: " + position);
 		position = _indexer.NextPhrase(query, i._docid, position.intValue()+1);
 	    }
 	    i=_indexer.nextDoc(query,i._docid);
-	    System.out.println();
+	   // System.out.println();
 	}
 	    
 
