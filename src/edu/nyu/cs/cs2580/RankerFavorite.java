@@ -72,29 +72,32 @@ class RankerFavorite extends Ranker {
 
   private double runquery_cosine(Query query, Document doc) {
     double score = 0.0;
-    // total number of docs, from indexer
-    int num_docs = _indexer.numDocs();
-    //    double num_terms = (double) ((DocumentIndexed) doc).getNumTerms();
 
-    for (String queryToken : query._tokens){
-
-      // number of occurrences of this term, from postings list
-      int tf = _indexer.documentTermFrequency(queryToken, Integer.toString(doc._docid) );
-      // scale tf by num terms in this doc
-      //      double scaled_tf = tf / num_terms;
-
-      // number of docs word is in, from indexer
-      int df = _indexer.corpusTermFrequency(queryToken);
-
-      double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
-      score += tf * tf  *  idf * idf;
-
-      System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
-    }
-    // make the score smaller
-    return Math.log(score);
+    if (_options._indexerType.equals("inverted-doconly")) {
+	for (String queryToken : query._tokens) {
+	    int idx = ((IndexerInvertedDoconly) _indexer).getTerm(queryToken);
+	    if (idx >= 0 ) 
+		score += ((DocumentIndexed) doc).getTFIDF(idx);
+	}
+    } else {
+	// total number of docs, from indexer
+	int num_docs = _indexer.numDocs();
+	for (String queryToken : query._tokens){
+	    
+	    // number of occurrences of this term, from postings list
+	    int tf = _indexer.documentTermFrequency(queryToken, Integer.toString(doc._docid) );
+	    // number of docs word is in, from indexer
+	    int df = _indexer.corpusDocFrequencyByTerm(queryToken);
+	    
+	    double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
+	    score += tf * idf;
+	    
+	    System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
+	}
+	score = Math.log(score);
+    }   
+    return score;
   }
-
 }
 
 
