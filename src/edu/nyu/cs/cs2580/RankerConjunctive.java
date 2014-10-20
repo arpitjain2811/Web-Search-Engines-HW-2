@@ -35,11 +35,11 @@ public class RankerConjunctive extends Ranker {
     QueryPhrase qp=new QueryPhrase(query._raw);
     qp.processQuery();
     
-    System.out.println(qp.phrase.size());
+   // System.out.println(qp.phrase.size());
     
     Document i = _indexer.nextDoc(query, -1);
     
-    System.out.println("Next Called Doc "+i._docid);
+    //System.out.println("Next Called Doc "+i._docid);
     
     Double pos;
     int j;
@@ -48,14 +48,14 @@ public class RankerConjunctive extends Ranker {
     while(i != null){
     	
     	
-    	System.out.println(qp.phrase.size());
+    	//System.out.println(qp.phrase.size());
         if(qp.phrase.size()>0)
         {
       	 
   		  for(j=0;j<qp.phrase.size();j++)
   		  {
   			 pos=_indexer.NextPhrase(qp.phrase.get(j), i._docid, -1);
-  			 System.out.println(pos);
+  			// System.out.println(pos);
   			 
   			 if(pos==Double.POSITIVE_INFINITY)
   			 {

@@ -100,25 +100,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
       }
       DocReader = null;
 	
-      /*
-	String corpusFile = _options._corpusPrefix + "/corpus.tsv";
-	System.out.println("Construct index from: " + corpusFile);
-	
-	int n_doc = 0;
-	BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
-	try {
-	    String line = null;
-	    while ((line = reader.readLine()) != null) {
-		System.out.println("Document"+n_doc);
-		processDocument(line);
-		_term_position.clear();
-		
-		n_doc++;
-	      }
-	} finally {
-	    reader.close();
-	}
-      */
+
 	System.out.println(
 			   "Indexed " + Integer.toString(_numDocs) + " docs with " +
 			   Long.toString(_totalTermFrequency) + " terms.");
@@ -148,6 +130,13 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	_term_list=null;
 	_skip_pointer=null;
 	_term_position=null;
+	corpusDir=null;
+	DocReader=null;
+	indexFile=null;
+	list=null;
+	skip=null;
+	_options=null;
+	
 	
 	writer.writeObject(this);
 	writer.close();
@@ -494,7 +483,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	// end of occurrence list for doc
 	int indx_end = get_doc_end(Pt, docid);
 	// if cur position is at or past the last occurence, no more possible phrases
-	if( indx_end == -1 || Pt.get(indx_end) <= pos)
+	if( indx_end == -1 || Pt.get(indx_end) < pos)
 	    return Double.POSITIVE_INFINITY;
 	    
 	// get the index of the first position
@@ -505,7 +494,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	// iterate through position list until you pass current position
 	int i = indx_start;
-	for(; Pt.get(i) <= pos; i++);
+	for(; Pt.get(i) < pos; i++);
 	
 	// return that next position
 	return 1.0 * Pt.get(i);
