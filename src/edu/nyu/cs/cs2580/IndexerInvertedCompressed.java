@@ -281,6 +281,7 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	doc.setTitle(title);
 	doc.setNumViews(numViews);
 	doc.setUrl(url);
+	((DocumentIndexed) doc).removeAll();
 	System.out.println(url);
 
 	// add the document

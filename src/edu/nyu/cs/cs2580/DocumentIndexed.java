@@ -74,6 +74,13 @@ public class DocumentIndexed extends Document implements Serializable {
 	return;
     }
 
+    public void removeAll(){
+	_df = null;
+	_doc_tf = null;
+	_doc_tfidf = null;
+	return;
+    }
+
     public Double getTFIDF(Integer idx) {
 	return _doc_tfidf.containsKey(idx) ? _doc_tfidf.get(idx) / 10.0 : 0.0;
     }
