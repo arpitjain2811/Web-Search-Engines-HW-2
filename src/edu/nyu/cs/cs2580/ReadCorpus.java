@@ -44,15 +44,22 @@ public class ReadCorpus implements Serializable {
     public String createFileInput(final File filename) throws IOException {
 	StringBuilder out = new StringBuilder();
 	StringBuilder body = new StringBuilder();
-	out.append(filename.getName());
-	out.append('\t');
+
 	String html = readFile(filename);
 	Document doc = Jsoup.parse(html);
-	Element content = doc.getElementById("bodyContent");
-	Elements ps = content.getElementsByTag("p");
-	for (Element p : ps) {
-	    body.append(p.text());
-	} 
+
+	out.append(filename.getName().replace("_", " "));
+	out.append('\t');
+	
+	body.append( getTagText(doc, "h1"));
+	out.append(' ');
+	body.append( getTagText(doc, "h2"));
+	out.append(' ');
+	//	body.append( getTagText(doc, "h3"));
+	//	out.append(' ');
+	body.append( getTagText(doc, "p"));
+	out.append(' ');
+	
 	out.append( cleanAndStem(body.toString()) );
 	out.append('\t');
 	out.append('0');
@@ -62,6 +69,17 @@ public class ReadCorpus implements Serializable {
 	return out.toString();
     }
     
+    private String getTagText(Document html_doc, String tag) {
+	StringBuilder sectionText = new StringBuilder();
+	Elements tags = html_doc.getElementsByTag(tag);
+	for (Element elem : tags) {
+	    sectionText.append(elem.text());
+	    sectionText.append(' ');
+	} 
+	return sectionText.toString();
+    }
+
+
     private String readFile(File filename) throws IOException {
 	BufferedReader reader = new BufferedReader(new FileReader(filename));
 	StringBuilder everything = new StringBuilder();
@@ -73,10 +91,10 @@ public class ReadCorpus implements Serializable {
     }    
 
     public String cleanAndStem(String body) throws IOException {
-	body = body.replaceAll("-", " ");
-	body = body.replaceAll("\\s+", " ");
-	String charsToDel = "`~!@#$%^&*()_+=[]\\{}|;':\",./<>?";
-	body = body.replaceAll("[" + Pattern.quote(charsToDel)  + "]", "");
+	//	body = body.replaceAll("-", " ");
+	//	body = body.replaceAll("\\s+", " ");
+	String charsToDel = "`~!@#$%^&*()_-+=[]\\{}|;':\",./<>?";
+	body = body.replaceAll("[" + Pattern.quote(charsToDel)  + "]", " ");
 
 	StringBuilder out = new StringBuilder();
 	char[] w = new char[501];
