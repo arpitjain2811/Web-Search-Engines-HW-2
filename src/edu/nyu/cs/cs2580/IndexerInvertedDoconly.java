@@ -37,8 +37,8 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 		      new HashMap<Integer, Integer>();
 	private Map<Integer, Integer> _termDocFrequency =
 		      new HashMap<Integer, Integer>();
-	private Integer c_t=-1;
-	
+	private Map<String, Integer> cache = new HashMap<String, Integer>();
+	private Integer c_t = -1;
 	
   public IndexerInvertedDoconly(Options options) {
     super(options);
@@ -315,8 +315,13 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 	
 	for(int i=0;i<query._tokens.size();i++)
 	{
+		String token = query._tokens.get(i);
+		c_t = cache.containsKey(token) ? cache.get(token) : -1;
+		
 		docids.add(i, next(query._tokens.get(i),docid ));
-		c_t=-1;
+		
+		cache.put(token, c_t);
+		
 		if(docids.get(i)==Double.POSITIVE_INFINITY)
 		{
 			return null;
