@@ -17,7 +17,7 @@ import java.util.Vector;
 public class Query {
   public String _query = null;
   public Vector<String> _tokens = new Vector<String>();
-  private ReadCorpus Cleaner = new ReadCorpus();
+  public ReadCorpus Cleaner = new ReadCorpus();
 
 
   public Query(String query) {

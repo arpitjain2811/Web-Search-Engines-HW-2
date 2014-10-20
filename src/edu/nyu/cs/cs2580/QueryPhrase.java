@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.IOException;
 
 /**
  * @CS2580: implement this class for HW2 to handle phrase. If the raw query is
@@ -46,6 +47,13 @@ public class QueryPhrase extends Query {
     phrase.add(q_query);
   }
   
+    // **** clean and stem query ****
+    try {
+	_query = Cleaner.cleanAndStem(_query);
+    }
+    catch (IOException e) {
+	System.err.println("Could not clean query: " + e.getMessage());
+    }
   
   
   Scanner s = new Scanner(q);
