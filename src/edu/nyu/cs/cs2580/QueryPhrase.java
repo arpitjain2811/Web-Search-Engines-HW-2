@@ -49,7 +49,7 @@ public class QueryPhrase extends Query {
   
     // **** clean and stem query ****
     try {
-	_query = Cleaner.cleanAndStem(_query);
+	q = Cleaner.cleanAndStem(q);
     }
     catch (IOException e) {
 	System.err.println("Could not clean query: " + e.getMessage());
@@ -61,8 +61,6 @@ public class QueryPhrase extends Query {
     _tokens.add(s.next());
   }
   s.close();
-	  
-	  
 	  
   }
 }
