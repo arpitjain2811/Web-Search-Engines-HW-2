@@ -6,6 +6,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Vector;
 
+
+
 import edu.nyu.cs.cs2580.QueryHandler.CgiArguments;
 import edu.nyu.cs.cs2580.SearchEngine.Options;
 
@@ -30,8 +32,10 @@ public class RankerConjunctive extends Ranker {
     int docid = -1;
     
     
-    QueryPhrase qp=new QueryPhrase(query._query);
+    QueryPhrase qp=new QueryPhrase(query._raw);
     qp.processQuery();
+    
+    System.out.println(qp.phrase.size());
     
     Document i = _indexer.nextDoc(query, -1);
     
@@ -81,6 +85,8 @@ public class RankerConjunctive extends Ranker {
         rankQueue.poll();
       }
       docid = i._docid;
+      
+      i = _indexer.nextDoc(query,i._docid);
     }
 
     Vector<ScoredDocument> results = new Vector<ScoredDocument>();
@@ -134,7 +140,7 @@ private double runquery_title(Query query, Document doc) {
 	    double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
 	    score += tf * idf;
 	    
-	    System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
+	   // System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
 	}
 	score = Math.log(score);
     }   

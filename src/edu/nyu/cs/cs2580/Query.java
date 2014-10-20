@@ -18,10 +18,11 @@ public class Query {
   public String _query = null;
   public Vector<String> _tokens = new Vector<String>();
   public ReadCorpus Cleaner = new ReadCorpus();
-
+  public String _raw;
 
   public Query(String query) {
     _query = query;
+    _raw=query;
   }
   
   public String getQuery()

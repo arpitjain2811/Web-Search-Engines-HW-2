@@ -595,7 +595,7 @@ private int get_doc_start(Vector<Integer> pt, int docid) {
     @Override
 public double NextPhrase(Query query, int docid, int pos) {
 
-    	System.out.println(query._tokens);
+    //	System.out.println(query._tokens);
 	// doing what the psuedo code says to do
 	Document doc = nextDoc(query, docid-1);
 	int doc_verify = doc._docid;
@@ -609,7 +609,7 @@ public double NextPhrase(Query query, int docid, int pos) {
 	    //
 	    Double it = next_pos(query._tokens.get(i), docid, pos);
 	    pos_vec.add(i, it);
-	    System.out.println(query._tokens.get(i) + " "+ pos_vec.get(i));
+	   // System.out.println(query._tokens.get(i) + " "+ pos_vec.get(i));
 	    if(pos_vec.get(i) == Double.POSITIVE_INFINITY)
 		return Double.POSITIVE_INFINITY;
 	}
@@ -637,7 +637,7 @@ private Double next_pos(String token, int docid, int pos) {
 	// end of occurrence list for doc
 	int indx_end = get_doc_end(Pt, docid);
 	
-	System.out.println("Last index for Doc:"+docid +": "+ indx_end);
+	
 	
 	// if cur position is at or past the last occurence, no more possible phrases
 	if( indx_end == -1 || Pt.get(indx_end) < pos)
