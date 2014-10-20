@@ -1,12 +1,8 @@
 JCC = javac
 JVM = java
 JFLAGS = -classpath jsoup-1.8.1.jar
-<<<<<<< Updated upstream
 INDEXFLAGS = -classpath "jsoup-1.8.1.jar:src" 
 RUNFLAGS = -classpath "jsoup-1.8.1.jar:src" -Xmx512m
-=======
-JVMFLAGS = -classpath "jsoup-1.8.1.jar:src" 
->>>>>>> Stashed changes
 .SUFFIXES: .java .class
 
 .java.class:
@@ -43,11 +39,7 @@ index:
 	$(JVM) $(INDEXFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=index --options=conf/engine.conf
 
 run:
-<<<<<<< Updated upstream
 	$(JVM) $(RUNFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=serve --port=25888 --options=conf/engine.conf 
-=======
-	$(JVM) $(JVMFLAGS) -Xmx512m edu.nyu.cs.cs2580.SearchEngine --mode=serve --port=25808 --options=conf/engine.conf 
->>>>>>> Stashed changes
 
 clean:
 	find . -name '*.class' -exec rm -rf {} \;
