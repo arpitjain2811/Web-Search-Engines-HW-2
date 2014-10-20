@@ -28,8 +28,6 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 
 	private static final long serialVersionUID = 2698138733115785548L;
 
-    private ReadCorpus DocReader = new ReadCorpus();
-    	
 	private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 //	private Vector<String> _terms = new Vector<String>();
 	private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
@@ -49,6 +47,8 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 
   @Override
   public void constructIndex() throws IOException {
+
+      ReadCorpus DocReader = new ReadCorpus();
 
       String corpusDir = _options._corpusPrefix;
       System.out.println("Constructing index documents in: " + corpusDir);
@@ -88,120 +88,116 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 	      }
 	  } 
       }
+   
+      DocReader=null;
+      
 
-      /*
- 	  String corpusFile = _options._corpusPrefix + "/corpus.tsv";
-	  System.out.println("Construct index from: " + corpusFile);
+      // set the tfidf vectors
+      int num_docs = _documents.size();
+      for (Document doc : _documents) {
+	  ((DocumentIndexed) doc).createTFIDF(num_docs);
+      }
+      // delete the doc freq hashmap in the document indexed class
+      Document tempdoc = _documents.get(0);
+      ((DocumentIndexed) tempdoc).removeDF();
+      tempdoc = null;
 
-	    BufferedReader reader = new BufferedReader(new FileReader(corpusFile));
-	    try {
-	      String line = null;
-	      while ((line = reader.readLine()) != null) {
-	    	
-	        processDocument(line);
-	      }
-	    } finally {
-	      reader.close();
-	    }
-      */
-	    System.out.println(
-	        "Indexed " + Integer.toString(_numDocs) + " docs with " +
-	        Long.toString(_totalTermFrequency) + " terms.");
-
-	    String indexFile = _options._indexPrefix + "/corpus.idx";
-	    System.out.println("Store index to: " + indexFile);
-	    ObjectOutputStream writer =
-	        new ObjectOutputStream(new FileOutputStream(indexFile));
-	    
-	    DocReader=null;
-	   
-	    
-	    writer.writeObject(this);
-	    writer.close();
-	  
+      System.out.println(
+			 "Indexed " + Integer.toString(_numDocs) + " docs with " +
+			 Long.toString(_totalTermFrequency) + " terms.");
+      
+      String indexFile = _options._indexPrefix + "/corpus.idx";
+      System.out.println("Store index to: " + indexFile);
+      ObjectOutputStream writer =
+	  new ObjectOutputStream(new FileOutputStream(indexFile));
+         
+      writer.writeObject(this);
+      writer.close();
+      
   }
 
   private void processDocument(String content) {
-	// TODO Auto-generated method stub
+      
+      Scanner s = new Scanner(content).useDelimiter("\t");
+      Set<Integer> uniqueTerms = new HashSet<Integer>();
+
+      // create the document   
+      DocumentIndexed doc = new DocumentIndexed(_documents.size());
+
+      // pass the title
+      String title = s.next();
+      // pass doc to also update term freqs for this doc
+      readTermVector(title, uniqueTerms, doc);
+      
+      // pass the body also updating doc term freqs
+      readTermVector(s.next(), uniqueTerms, doc);
+      
+      // get number of views
+      int numViews = Integer.parseInt(s.next());
+      s = null;
+
+      // update stuff for doc
+      doc.setTitle(title);
+      doc.setNumViews(numViews);
+      
+      
+      // list will only contain the document id for each term
+      Vector<Integer> list;
+      for (Integer idx : uniqueTerms) {
+	  // increase number of docs this term occurs in
+	  _termDocFrequency.put(idx, _termDocFrequency.get(idx) + 1);
+	  doc.updateDocTermFreq(idx);
+
+	  // add this doc to index
+	  list = _postings.get(idx);
+	  // dont subtract 1 here since document is added later
+	  list.add(_documents.size());
+	  _postings.put(idx, list);
 	  
-	  Scanner s = new Scanner(content).useDelimiter("\t");
+      }
 
-	    String title = s.next();
-	    Vector<Integer> titleTokens = new Vector<Integer>();
-	    readTermVector(title, titleTokens);
-
-	    Vector<Integer> bodyTokens = new Vector<Integer>();
-	    readTermVector(s.next(), bodyTokens);
-
-	    int numViews = Integer.parseInt(s.next());
-	    s.close();
-
-	  
-		DocumentIndexed doc = new DocumentIndexed(_documents.size());
-	    
-		
-		doc.setTitle(title);
-	    doc.setNumViews(numViews);
-	    
-	    _documents.add(doc); 
-	  
-	    _numDocs++;
-
-	    Set<Integer> uniqueTerms = new HashSet<Integer>();
-	    updateStatistics(titleTokens, uniqueTerms);
-	    updateStatistics(bodyTokens, uniqueTerms);
-	    
-	    Vector<Integer> list;
-	    
-	    for (Integer idx : uniqueTerms) {
-	      _termDocFrequency.put(idx, _termDocFrequency.get(idx) + 1);
-
-	      
-	      list=_postings.get(idx);
-	      list.add(_documents.size()-1);
-	      
-	      
-	 
-	      _postings.put(idx, list);
-	      
-
-	    }
-	
-}
+      // add the document
+      _documents.add(doc); 
+      _numDocs++;
+      
+  }
   
-  private void readTermVector(String content, Vector<Integer> tokens) {
-	    Scanner s = new Scanner(content);  // Uses white space by default.
-	    while (s.hasNext()) {
-	      String token = s.next();
-	      int idx = -1;
-	   
-	      if (_dictionary.containsKey(token)) {
+    private void readTermVector(String content, Set<Integer> uniques, Document doc) {
+	Scanner s = new Scanner(content);  // Uses white space by default.
+	while (s.hasNext()) {
+	    
+	    String token = s.next();
+	    int idx = -1;
+	    
+	    // get index from the dictionary or add it
+	    if (_dictionary.containsKey(token)) {
 	        idx = _dictionary.get(token);
-	      } else {
-	    	 
+	    } else {
+		
 	        idx =_dictionary.size();
-//	        _terms.add(token);
 	        _dictionary.put(token, idx);
-	        
+		
+		// create these things for new word
 	        _termCorpusFrequency.put(idx, 0);
 	        _termDocFrequency.put(idx, 0);
 	        _postings.put(idx,new Vector<Integer>());
-	      }
-	      tokens.add(idx);
-
 	    }
-	    return;
-	  }
-	  
-  
-private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
-   for (int idx : tokens) {
-     uniques.add(idx);
-     _termCorpusFrequency.put(idx, _termCorpusFrequency.get(idx) + 1);
-     ++_totalTermFrequency;
-   }
- }
-  
+	    
+	    // add term to unique set
+	    uniques.add(idx);
+
+	    // update doc tf
+	    ((DocumentIndexed) doc).updateTermFreq(idx);
+	    
+	    // update stats
+	    _termCorpusFrequency.put(idx, _termCorpusFrequency.get(idx) + 1);
+	    ++_totalTermFrequency;
+	    
+	}
+	return;
+    }
+    
+    
 @Override
   public void loadIndex() throws IOException, ClassNotFoundException {
 	  
@@ -333,6 +329,11 @@ private void updateStatistics(Vector<Integer> tokens, Set<Integer> uniques) {
 	return nextDoc(query, Collections.max(docids).intValue()-1);
 	
   }
+
+    public int getTerm(String term){
+	return _dictionary.containsKey(term) ? _dictionary.get(term) : -1;
+    }
+
 
   @Override
   public double NextPhrase(Query query, int docid, int pos) {

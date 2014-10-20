@@ -30,8 +30,6 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
      */
     private static final long serialVersionUID = 1626440145434710491L;
     
-    private ReadCorpus DocReader = new ReadCorpus();
-    
     private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 
     private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
@@ -52,6 +50,8 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
     }
     
     public void constructIndex() throws IOException {
+
+	ReadCorpus DocReader = new ReadCorpus();
 	
       String corpusDir = _options._corpusPrefix;
       System.out.println("Constructing index documents in: " + corpusDir);
@@ -85,13 +85,9 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 		  }
 	      }
 	      else {
-<<<<<<< Updated upstream
 		  System.out.println(n_doc + " " + fileEntry.getName());
-		  
-=======
-		  System.out.println(n_doc+" "+fileEntry.getName());
 		  n_doc++;
->>>>>>> Stashed changes
+
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
 		  
@@ -101,6 +97,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	      }
 	  } 
       }
+      DocReader = null;
 	
       /*
 	String corpusFile = _options._corpusPrefix + "/corpus.tsv";
