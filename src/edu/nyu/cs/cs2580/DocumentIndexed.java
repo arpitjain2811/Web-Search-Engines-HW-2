@@ -50,15 +50,27 @@ public class DocumentIndexed extends Document {
 		int df = _df.get( key );
 		      
 		double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
+<<<<<<< HEAD
 		_doc_tfidf.put( key, idf * tf );
 		total += idf*idf * tf*tf;
+=======
+		Double tfidf = tf * idf * 1000;
+		_doc_tfidf.put( key, tfidf.intValue() );
+		total += tf * tf * idf * idf;
+>>>>>>> FETCH_HEAD
 
 	    }
       
 	//Normalize
 	for( Integer key : _doc_tf.keySet() )
 	    {
+<<<<<<< HEAD
 		_doc_tfidf.put( key, _doc_tfidf.get( key ) / Math.sqrt(total) );
+=======
+	    Double temp_tfidf = _doc_tfidf.get( key ) * 1.0;
+	    Integer final_tfidf = ( (Double) (temp_tfidf / Math.sqrt(total)) ).intValue();
+		_doc_tfidf.put( key, final_tfidf );
+>>>>>>> FETCH_HEAD
 	    }
 	_doc_tf = null;
 	
@@ -71,7 +83,7 @@ public class DocumentIndexed extends Document {
     }
 
     public Double getTFIDF(Integer idx) {
-	return _doc_tfidf.containsKey(idx) ? _doc_tfidf.get(idx) : 0.0;
+	return _doc_tfidf.containsKey(idx) ? _doc_tfidf.get(idx) / 10.0 : 0.0;
     }
 
 
