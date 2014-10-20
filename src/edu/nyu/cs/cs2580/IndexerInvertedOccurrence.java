@@ -180,13 +180,16 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	// get number of views
 	int numViews = Integer.parseInt(s.next());
+
+	String url = s.next();
+
 	s=null;
 	
 	// create the document
 	DocumentIndexed doc = new DocumentIndexed(_documents.size());
 	doc.setTitle(title);
 	doc.setNumViews(numViews);
-	//	doc.setNumTerms(numTerms);
+	doc.setUrl(url);
 
 	// add the document
 	_documents.add(doc); 

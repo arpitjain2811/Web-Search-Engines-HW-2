@@ -146,19 +146,7 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	    posting = update_skip(skip,skip.size());
 	    posting.addAll(list);
 	    
-	    
-	   
-	    
-//	    System.out.println(posting.toString());
-	    
-	    
 	    bits=elias_encode(posting,i);
-	     
-	   
-	// System.out.println(_postings.size());
-	 
-	// System.out.println(bits.length());
-	 
 
 	    _postings.put(i, bits);
 	    
@@ -282,6 +270,8 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	// get number of views
 	int numViews = Integer.parseInt(s.next());
 	//System.out.println(numViews);
+
+	String url = s.next();
 	
 	s.close();
 	
@@ -289,7 +279,9 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	DocumentIndexed doc = new DocumentIndexed(_documents.size());
 	doc.setTitle(title);
 	doc.setNumViews(numViews);
-	
+	doc.setUrl(url);
+	System.out.println(url);
+
 	// add the document
 	_documents.add(doc); 
 	_numDocs++;
