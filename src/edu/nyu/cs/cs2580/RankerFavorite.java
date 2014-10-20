@@ -29,11 +29,12 @@ class RankerFavorite extends Ranker {
   }
 
   @Override
-  public Vector<ScoredDocument> runQuery(QueryPhrase query, int numResults) {    
+  public Vector<ScoredDocument> runQuery(Query query, int numResults) {    
     Vector<ScoredDocument> all = new Vector<ScoredDocument>();
     
 
-    
+    QueryPhrase qp=new QueryPhrase(query._query);
+    qp.processQuery();
     
     Document i = _indexer.nextDoc(query, -1);
     
@@ -44,38 +45,12 @@ class RankerFavorite extends Ranker {
     while(i != null) {
       System.out.println("Next Called Doc "+i._docid);
       
-      System.out.println(query.phrase.size());
-      if(query.phrase.size()>0)
-      {
-    	 
-		  for(j=0;j<query.phrase.size();j++)
-		  {
-			 pos=_indexer.NextPhrase(query.phrase.get(j), i._docid, -1);
-			 System.out.println(pos);
-			 
-			 if(pos==Double.POSITIVE_INFINITY)
-			 {
-				 
-				 break;
-			 }
-			  
-		  }
-		  
-		  if(j==query.phrase.size())
-		  {
-			  
-			  all.add(scoreDocument(query, i));
-			  
-		  }
-	  }
       
-      else
-      {
     	  
     	  all.add(scoreDocument(query, i));
     	  
     	  
-      }
+      
       
       //NExt phrase pos = -
       // check if returned position is valid
