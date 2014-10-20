@@ -2,6 +2,8 @@ package edu.nyu.cs.cs2580;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -41,15 +43,22 @@ public class ReadCorpus implements Serializable {
     // for wiki text
     public String createFileInput(final File filename) throws IOException {
 	StringBuilder out = new StringBuilder();
+	StringBuilder body = new StringBuilder();
 	out.append(filename.getName());
 	out.append('\t');
 	String html = readFile(filename);
 	Document doc = Jsoup.parse(html);
-	String body = doc.body().text();
-	body = cleanAndStem(body);
-	out.append(body);
+	Element content = doc.getElementById("bodyContent");
+	Elements ps = content.getElementsByTag("p");
+	for (Element p : ps) {
+	    body.append(p.text());
+	} 
+	out.append( cleanAndStem(body.toString()) );
 	out.append('\t');
 	out.append('0');
+
+	//	System.out.println(out.toString());
+
 	return out.toString();
     }
     
