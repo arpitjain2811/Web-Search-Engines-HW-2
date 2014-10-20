@@ -39,7 +39,7 @@ index:
 	$(JVM) $(INDEXFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=index --options=conf/engine.conf
 
 run:
-	$(JVM) $(RUNFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=serve --port=25888 --options=conf/engine.conf 
+	$(JVM) $(RUNFLAGS) edu.nyu.cs.cs2580.SearchEngine --mode=serve --port=25808 --options=conf/engine.conf 
 
 clean:
 	find . -name '*.class' -exec rm -rf {} \;
