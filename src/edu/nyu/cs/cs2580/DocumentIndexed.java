@@ -51,15 +51,18 @@ public class DocumentIndexed extends Document implements Serializable {
 		int df = _df.get( key );
 		      
 		double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
-		_doc_tfidf.put( key, (int)(idf * tf*100) );
-		total += idf*idf * tf*tf;
+		Double tfidf = tf * idf * 1000;
+		_doc_tfidf.put( key, tfidf.intValue() );
+		total += tf * tf * idf * idf;
 
 	    }
       
 	//Normalize
 	for( Integer key : _doc_tf.keySet() )
 	    {
-		_doc_tfidf.put( key, (int)((_doc_tfidf.get( key ) / Math.sqrt(total))*100) );
+	    Double temp_tfidf = _doc_tfidf.get( key ) * 1.0;
+	    Integer final_tfidf = ( (Double) (temp_tfidf / Math.sqrt(total)) ).intValue();
+		_doc_tfidf.put( key, final_tfidf );
 	    }
 	_doc_tf = null;
 	
@@ -72,7 +75,7 @@ public class DocumentIndexed extends Document implements Serializable {
     }
 
     public Double getTFIDF(Integer idx) {
-	return _doc_tfidf.containsKey(idx) ? _doc_tfidf.get(idx) : 0.0;
+	return _doc_tfidf.containsKey(idx) ? _doc_tfidf.get(idx) / 10.0 : 0.0;
     }
 
 
