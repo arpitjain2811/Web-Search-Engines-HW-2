@@ -28,8 +28,6 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 
 	 private static final long serialVersionUID = 1626440145434710491L;
 	    
-	    private ReadCorpus DocReader = new ReadCorpus();
-	    
 	    private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 	    private Map<String, Vector<Integer>> _decoded = new HashMap<String, Vector<Integer>>();
 	    private HashMap<Integer, Integer> elias = new HashMap<Integer,Integer>();
@@ -53,7 +51,10 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 
   @Override
   public void constructIndex() throws IOException {
-	  String corpusDir = _options._corpusPrefix;
+
+      ReadCorpus DocReader = new ReadCorpus();
+      
+      String corpusDir = _options._corpusPrefix;
       System.out.println("Constructing index documents in: " + corpusDir);
 
       final File Dir = new File(corpusDir);
@@ -96,6 +97,8 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	      }
 	  } 
       }
+
+      DocReader = null;
 	
       /*
 	String corpusFile = _options._corpusPrefix + "/corpus.tsv";
