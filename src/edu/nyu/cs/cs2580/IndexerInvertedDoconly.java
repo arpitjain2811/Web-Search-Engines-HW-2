@@ -110,7 +110,10 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
       System.out.println("Store index to: " + indexFile);
       ObjectOutputStream writer =
 	  new ObjectOutputStream(new FileOutputStream(indexFile));
-         
+        
+      
+      
+      
       writer.writeObject(this);
       writer.close();
       

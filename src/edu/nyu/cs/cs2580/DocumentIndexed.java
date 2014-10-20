@@ -1,6 +1,5 @@
 package edu.nyu.cs.cs2580;
 
-import java.io.Serializable;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -8,12 +7,12 @@ import java.util.HashMap;
  * @CS2580: implement this class for HW2 to incorporate any additional
  * information needed for your favorite ranker.
  */
-public class DocumentIndexed extends Document implements Serializable {
+public class DocumentIndexed extends Document {
     private static final long serialVersionUID = 9184892508124423115L;
     
     private static HashMap <Integer, Integer> _df = new HashMap<Integer,Integer>();
     private HashMap <Integer, Integer> _doc_tf = new HashMap<Integer,Integer>();
-    private HashMap <Integer, Integer> _doc_tfidf = new HashMap<Integer,Integer>();
+    private HashMap <Integer, Double> _doc_tfidf = new HashMap<Integer,Double>();
     
     public DocumentIndexed(int docid) {
 	super(docid);
@@ -51,7 +50,7 @@ public class DocumentIndexed extends Document implements Serializable {
 		int df = _df.get( key );
 		      
 		double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
-		_doc_tfidf.put( key, (int)(idf * tf*100) );
+		_doc_tfidf.put( key, idf * tf );
 		total += idf*idf * tf*tf;
 
 	    }
@@ -59,7 +58,7 @@ public class DocumentIndexed extends Document implements Serializable {
 	//Normalize
 	for( Integer key : _doc_tf.keySet() )
 	    {
-		_doc_tfidf.put( key, (int)((_doc_tfidf.get( key ) / Math.sqrt(total))*100) );
+		_doc_tfidf.put( key, _doc_tfidf.get( key ) / Math.sqrt(total) );
 	    }
 	_doc_tf = null;
 	
