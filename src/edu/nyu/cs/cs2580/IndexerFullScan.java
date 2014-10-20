@@ -147,6 +147,8 @@ class IndexerFullScan extends Indexer implements Serializable {
     readTermVector(s.next(), bodyTokens);
 
     int numViews = Integer.parseInt(s.next());
+
+    String url = s.next();
     s.close();
 
     DocumentFull doc = new DocumentFull(_documents.size(), this);
@@ -154,6 +156,7 @@ class IndexerFullScan extends Indexer implements Serializable {
     doc.setNumViews(numViews);
     doc.setTitleTokens(titleTokens);
     doc.setBodyTokens(bodyTokens);
+    doc.setUrl(url);
     _documents.add(doc);
     ++_numDocs;
 

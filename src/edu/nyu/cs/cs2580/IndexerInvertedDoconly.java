@@ -134,12 +134,15 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
       
       // get number of views
       int numViews = Integer.parseInt(s.next());
+
+      String url = s.next();
+
       s = null;
 
       // update stuff for doc
       doc.setTitle(title);
       doc.setNumViews(numViews);
-      
+      doc.setUrl(url);
       
       // list will only contain the document id for each term
       Vector<Integer> list;

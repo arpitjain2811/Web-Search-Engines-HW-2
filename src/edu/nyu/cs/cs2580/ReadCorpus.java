@@ -31,6 +31,8 @@ public class ReadCorpus {
 	out.append(body);
 	out.append('\t');
 	out.append(s.next());
+	out.append('\t');
+	out.append(title.replace(" ", "_"));
 
 	return out.toString();
     }
@@ -39,7 +41,8 @@ public class ReadCorpus {
     public String createFileInput(final File filename) throws IOException {
 	StringBuilder out = new StringBuilder();
 	StringBuilder body = new StringBuilder();
-
+	StringBuilder url = new StringBuilder();
+	
 	String html = readFile(filename);
 	Document doc = Jsoup.parse(html);
 
@@ -50,16 +53,17 @@ public class ReadCorpus {
 	out.append(' ');
 	body.append( getTagText(doc, "h2"));
 	out.append(' ');
-	//	body.append( getTagText(doc, "h3"));
-	//	out.append(' ');
 	body.append( getTagText(doc, "p"));
 	out.append(' ');
-	
 	out.append( cleanAndStem(body.toString()) );
+	
 	out.append('\t');
 	out.append('0');
-
-	//	System.out.println(out.toString());
+	
+	url.append("en.wikipedia.org/wiki/");
+	url.append(filename.getName());
+	out.append('\t');
+	out.append(url);
 
 	return out.toString();
     }
