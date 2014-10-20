@@ -85,15 +85,19 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 		  }
 	      }
 	      else {
+<<<<<<< Updated upstream
 		  
 		  System.out.println(n_doc + "   " + fileEntry.getName());
 		  
+=======
+		  System.out.println(n_doc+fileEntry.getName());
+		  n_doc++;
+>>>>>>> Stashed changes
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
 		  
 		  _term_position.clear();
 		  
-		  n_doc++;
 	      }
 	  } 
       }
@@ -279,6 +283,8 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	
 	// get number of views
 	int numViews = Integer.parseInt(s.next());
+	//System.out.println(numViews);
+	
 	s.close();
 	
 	// create the document

@@ -85,14 +85,19 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 		  }
 	      }
 	      else {
+<<<<<<< Updated upstream
 		  System.out.println(n_doc + " " + fileEntry.getName());
 		  
+=======
+		  System.out.println(n_doc+" "+fileEntry.getName());
+		  n_doc++;
+>>>>>>> Stashed changes
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
 		  
 		  _term_position.clear();
 		  
-		  n_doc++;
+		 
 	      }
 	  } 
       }
@@ -168,7 +173,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	Scanner s = new Scanner(content).useDelimiter("\t");
 	Set<Integer> uniqueTerms = new HashSet<Integer>();
-
+	
 	// pass the title 
 	String title = s.next();
 	readTermVector(title, uniqueTerms);
@@ -178,7 +183,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	
 	// get number of views
 	int numViews = Integer.parseInt(s.next());
-	s.close();
+	s=null;
 	
 	// create the document
 	DocumentIndexed doc = new DocumentIndexed(_documents.size());
