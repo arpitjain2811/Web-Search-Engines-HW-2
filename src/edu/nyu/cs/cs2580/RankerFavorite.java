@@ -29,22 +29,70 @@ class RankerFavorite extends Ranker {
   }
 
   @Override
-  public Vector<ScoredDocument> runQuery(Query query, int numResults) {    
+  public Vector<ScoredDocument> runQuery(QueryPhrase query, int numResults) {    
     Vector<ScoredDocument> all = new Vector<ScoredDocument>();
+    
+
+    
     
     Document i = _indexer.nextDoc(query, -1);
     
+    System.out.println("Next Called Doc "+i._docid);
+    
+    Double pos;
+    int j;
     while(i != null) {
       System.out.println("Next Called Doc "+i._docid);
-
-      all.add(scoreDocument(query, i));
-	    i = _indexer.nextDoc(query,i._docid);
+      
+      System.out.println(query.phrase.size());
+      if(query.phrase.size()>0)
+      {
+    	 
+		  for(j=0;j<query.phrase.size();j++)
+		  {
+			 pos=_indexer.NextPhrase(query.phrase.get(j), i._docid, -1);
+			 System.out.println(pos);
+			 
+			 if(pos==Double.POSITIVE_INFINITY)
+			 {
+				 
+				 break;
+			 }
+			  
+		  }
+		  
+		  if(j==query.phrase.size())
+		  {
+			  
+			  all.add(scoreDocument(query, i));
+			  
+		  }
+	  }
+      
+      else
+      {
+    	  
+    	  all.add(scoreDocument(query, i));
+    	  
+    	  
+      }
+      
+      //NExt phrase pos = -
+      // check if returned position is valid
+      	//if invaid then call next doc
+      	//else if valid then score that document and then call next doc
+      
+      
+      i = _indexer.nextDoc(query,i._docid);
+      
+	  
     }
     
     Collections.sort(all, Collections.reverseOrder());
     Vector<ScoredDocument> results = new Vector<ScoredDocument>();
-    for (int j = 0; j < all.size() && j < numResults; ++j) {
-      results.add(all.get(j));
+    
+    for (int j1 = 0; j1 < all.size() && j1 < numResults; ++j1) {
+      results.add(all.get(j1));
     }
     return results;
   }

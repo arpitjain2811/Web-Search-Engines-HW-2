@@ -481,7 +481,8 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
     
     private Double next_pos(String token, int docid, int pos) {
 	// TODO Auto-generated method stub
-	
+	 
+
 	Vector<Integer> Pt = _postings.get(_dictionary.get(token));
 	
 	// end of occurrence list for doc

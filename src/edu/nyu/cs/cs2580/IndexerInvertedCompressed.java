@@ -484,14 +484,22 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
     @Override
 public Document nextDoc(Query query, int docid) {
 	
+    
 	Vector<Double> docids = new Vector<Double>(query._tokens.size());
 	
+	
 	for(int i=0;i<query._tokens.size();i++)
-	{
+	{ 
+		
 		if(!_decoded.containsKey(query._tokens.get(i)))
+		{
+
+		 
 		_decoded.put(query._tokens.get(i), Elias_decode(_postings.get(_dictionary.get(query._tokens.get(i))), query._tokens.get(i)));
-			
+		
+		}	
 	}
+  
 	
 	// get next doc for each term in query
 	for(int i = 0; i < query._tokens.size(); i++) {
@@ -505,10 +513,10 @@ public Document nextDoc(Query query, int docid) {
 	// found the next one
 	if(Collections.max(docids) == Collections.min(docids)) 
 	    return _documents.get(docids.get(0).intValue());
-	
+   
 	// not a match, run again
 	return nextDoc(query, Collections.max(docids).intValue()-1);
-	
+    
     }
     
     // return index that of last doc in skip pointer list
@@ -587,6 +595,7 @@ private int get_doc_start(Vector<Integer> pt, int docid) {
     @Override
 public double NextPhrase(Query query, int docid, int pos) {
 
+    	System.out.println(query._tokens);
 	// doing what the psuedo code says to do
 	Document doc = nextDoc(query, docid-1);
 	int doc_verify = doc._docid;
@@ -600,7 +609,7 @@ public double NextPhrase(Query query, int docid, int pos) {
 	    //
 	    Double it = next_pos(query._tokens.get(i), docid, pos);
 	    pos_vec.add(i, it);
-	    
+	    System.out.println(query._tokens.get(i) + " "+ pos_vec.get(i));
 	    if(pos_vec.get(i) == Double.POSITIVE_INFINITY)
 		return Double.POSITIVE_INFINITY;
 	}
@@ -614,8 +623,9 @@ public double NextPhrase(Query query, int docid, int pos) {
 	if(incr == pos_vec.size())
 		return pos_vec.get(0);
 	
+	int next_p=Collections.max(pos_vec).intValue();
 	
-	return NextPhrase(query, docid, Collections.max(pos_vec).intValue()); 
+	return NextPhrase(query, docid,next_p ); 
 	
     }
     
@@ -626,19 +636,23 @@ private Double next_pos(String token, int docid, int pos) {
 	
 	// end of occurrence list for doc
 	int indx_end = get_doc_end(Pt, docid);
+	
+	System.out.println("Last index for Doc:"+docid +": "+ indx_end);
+	
 	// if cur position is at or past the last occurence, no more possible phrases
-	if( indx_end == -1 || Pt.get(indx_end) <= pos)
+	if( indx_end == -1 || Pt.get(indx_end) < pos)
 	    return Double.POSITIVE_INFINITY;
 	    
 	// get the index of the first position
 	int indx_start = get_doc_start(Pt, docid);
+	
 	// first time called return the first occurrence
 	if (Pt.get(indx_start) > pos)
 	    return 1.0 * Pt.get(indx_start);
 	
 	// iterate through position list until you pass current position
 	int i = indx_start;
-	for(; Pt.get(i) <= pos; i++);
+	for(; Pt.get(i) < pos; i++);
 	
 	// return that next position
 	return 1.0 * Pt.get(i);
@@ -659,7 +673,6 @@ private Double next_pos(String token, int docid, int pos) {
 	 BitSet r;
 	
 	 
-	
 	
 	while(end<elias.get(_dictionary.get(t))-1)
 	{
@@ -700,57 +713,7 @@ private Double next_pos(String token, int docid, int pos) {
 	return pt;
 }
 
-public Double first_pos (String token, int docid) {
-	
-	Vector<Integer> Pt=_decoded.get(token);
-	  
-	  int lt=get_lt(Pt);
-	  
-	  
-	  if(lt==-1 || Pt.get(lt)<docid)
-			return Double.POSITIVE_INFINITY;
-	  
-	  int i;
-	  boolean found=false;
-	  
-	  for(i=0;i<=lt;i=i+2)
-	  {
-		  if(Pt.get(i)==docid)
-		  {
-			  found=true;
-			  System.out.println(found);
-			  break;
-		  }
-	  }
-	  
-	  if(found)
-	  {
-		  System.out.println(i);
-		  i--;
-		  int start_idx= Pt.get(i)+1;
-		  System.out.println("Found");
-		  if(Pt.get(start_idx)!=docid)
-		  {
-			  System.out.println("Something wrong in logic");
-		  }
-		  
-		 
-		  System.out.println("Found");
-		  start_idx=start_idx+2;
-		  
-		  
-		  System.out.println("Found");
-		  return (double) Pt.get(start_idx);
-		  
-		  
-	  }
-	  
-	  else
-		  return null;
 
-  
-  
-}
   
 
 @Override

@@ -51,7 +51,7 @@ public abstract class Ranker {
    * @param numResults number of results to return
    * @return Up to {@code numResults} scored documents in ranked order
    */
-  public abstract Vector<ScoredDocument> runQuery(Query query, int numResults);
+  public abstract Vector<ScoredDocument> runQuery(QueryPhrase query, int numResults);
 
   /**
    * All Rankers must be created through this factory class based on the
