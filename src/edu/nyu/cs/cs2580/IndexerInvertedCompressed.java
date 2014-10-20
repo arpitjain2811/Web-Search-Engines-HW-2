@@ -85,14 +85,9 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 		  }
 	      }
 	      else {
-<<<<<<< Updated upstream
-		  
 		  System.out.println(n_doc + "   " + fileEntry.getName());
 		  
-=======
-		  System.out.println(n_doc+fileEntry.getName());
 		  n_doc++;
->>>>>>> Stashed changes
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
 		  
