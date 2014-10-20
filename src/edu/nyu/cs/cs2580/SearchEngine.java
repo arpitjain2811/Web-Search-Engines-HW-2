@@ -154,9 +154,14 @@ public class SearchEngine {
     Indexer indexer = Indexer.Factory.getIndexerByOption(SearchEngine.OPTIONS);
     Check(indexer != null,
         "Indexer " + SearchEngine.OPTIONS._indexerType + " not found!");
+    
+	  
     indexer.loadIndex();
+    
     QueryHandler handler = new QueryHandler(SearchEngine.OPTIONS, indexer);
 
+    
+    
     // Establish the serving environment
     InetSocketAddress addr = new InetSocketAddress(SearchEngine.PORT);
     HttpServer server = HttpServer.create(addr, -1);
@@ -168,7 +173,9 @@ public class SearchEngine {
   }
   
   public static void main(String[] args) {
-    try {
+	  
+	  
+	  try {
       SearchEngine.parseCommandLine(args);
       switch (SearchEngine.MODE) {
       case INDEX:

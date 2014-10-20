@@ -38,10 +38,10 @@ class RankerFavorite extends Ranker {
     
     Document i = _indexer.nextDoc(query, -1);
     
-    System.out.println("Next Called Doc "+i._docid);
+   // System.out.println("Next Called Doc "+i._docid);
     
-    Double pos;
-    int j;
+  //  Double pos;
+ //   int j;
     while(i != null) {
       System.out.println("Next Called Doc "+i._docid);
       

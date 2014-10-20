@@ -294,7 +294,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
 	this._termCorpusFrequency = loaded._termCorpusFrequency;
 	this._termDocFrequency = loaded._termDocFrequency;
 	reader.close();
-	
+	loaded=null;
 	System.out.println(Integer.toString(_numDocs) + " documents loaded " +
 			   "with " + Long.toString(_totalTermFrequency) + " terms!"); 
 	

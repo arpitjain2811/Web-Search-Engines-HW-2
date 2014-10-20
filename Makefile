@@ -3,7 +3,6 @@ JVM = java
 JFLAGS = -classpath jsoup-1.8.1.jar
 INDEXFLAGS = -classpath "jsoup-1.8.1.jar:src" 
 RUNFLAGS = -classpath "jsoup-1.8.1.jar:src" -Xmx512m
-.SUFFIXES: .java .class
 
 .java.class:
 	$(JCC) $(JFLAGS) $*.java

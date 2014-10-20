@@ -1,11 +1,14 @@
 package edu.nyu.cs.cs2580;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -16,7 +19,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
-
 
 import edu.nyu.cs.cs2580.SearchEngine.Options;
 
@@ -30,7 +32,7 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 
 	private Map<String, Integer> _dictionary = new HashMap<String, Integer>();
 //	private Vector<String> _terms = new Vector<String>();
-	private HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
+	private  HashMap<Integer, Vector<Integer> > _postings=new HashMap<Integer,Vector<Integer>>();
 	private Vector<Document> _documents=new Vector<Document>();
 	
 	private Map<Integer, Integer> _termCorpusFrequency =
@@ -119,7 +121,7 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
       
   }
 
-  private void processDocument(String content) {
+  private  void processDocument(String content) {
       
       Scanner s = new Scanner(content).useDelimiter("\t");
       Set<Integer> uniqueTerms = new HashSet<Integer>();
@@ -166,6 +168,9 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
       _documents.add(doc); 
       _numDocs++;
       
+      uniqueTerms=null;
+      list=null;
+      
   }
   
     private void readTermVector(String content, Set<Integer> uniques, Document doc) {
@@ -210,11 +215,25 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
 	String indexFile = _options._indexPrefix + "/corpus.idx";
     System.out.println("Load index from: " + indexFile);
 
-    ObjectInputStream reader =
-        new ObjectInputStream(new FileInputStream(indexFile));
-    IndexerInvertedDoconly loaded = (IndexerInvertedDoconly) reader.readObject();
+    InputStream file = new FileInputStream(indexFile);
+    InputStream buffer = new BufferedInputStream(file);
+    ObjectInput reader = new ObjectInputStream (buffer);
+    
 
+	 
+    
+//    ObjectInputStream reader =
+//        new ObjectInputStream(new FileInputStream(indexFile));
+    IndexerInvertedDoconly loaded = (IndexerInvertedDoconly) reader.readObject();
+    
+    reader.close();
+    
+    
+    
+	  
     this._documents = loaded._documents;
+   
+    
     // Compute numDocs and totalTermFrequency b/c Indexer is not serializable.
     this._numDocs = _documents.size();
     for (Integer freq : loaded._termCorpusFrequency.values()) {
@@ -222,11 +241,16 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
     }
     this._postings=loaded._postings;
     this._dictionary = loaded._dictionary;
+    
 //    this._terms = loaded._terms;
     this._termCorpusFrequency = loaded._termCorpusFrequency;
+   
     this._termDocFrequency = loaded._termDocFrequency;
-    reader.close();
-
+    
+   
+    loaded=null;
+    
+   
     System.out.println(Integer.toString(_numDocs) + " documents loaded " +
         "with " + Long.toString(_totalTermFrequency) + " terms!"); 
 	
