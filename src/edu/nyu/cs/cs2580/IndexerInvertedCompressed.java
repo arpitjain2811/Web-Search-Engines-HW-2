@@ -38,7 +38,8 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 		new HashMap<Integer, Integer>();
 	    private Map<Integer, Integer> _termDocFrequency =
 		new HashMap<Integer, Integer>();
-	    private Integer c_t=-1;
+		private Map<String, Integer> cache = new HashMap<String, Integer>();
+		private Integer c_t = -1;
 	    private HashMap<Integer,Vector<Integer>> _term_position = new HashMap<Integer,Vector<Integer>>();
 	    private HashMap<Integer,Vector<Integer>> _skip_pointer=new HashMap<Integer,Vector<Integer>>();
 	    private HashMap<Integer,Vector<Integer>> _term_list=new HashMap<Integer,Vector<Integer>>();
@@ -503,9 +504,14 @@ public Document nextDoc(Query query, int docid) {
 	
 	// get next doc for each term in query
 	for(int i = 0; i < query._tokens.size(); i++) {
+		
+		String token = query._tokens.get(i);
+		c_t = cache.containsKey(token) ? cache.get(token) : -1;
+		
 	    docids.add(i, next(query._tokens.get(i), docid) );
-	    // resest the cache before going to next term, cache useless right now
-	    c_t = 0;
+
+   		cache.put(token, c_t);
+
 	    if(docids.get(i) == Double.POSITIVE_INFINITY)
 		return null;
 	}
