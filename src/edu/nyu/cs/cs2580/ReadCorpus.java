@@ -17,13 +17,8 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 
 
-public class ReadCorpus implements Serializable {
+public class ReadCorpus {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4143027004911898369L;
-
     // for test corpus
     public String createFileInput(String content) throws IOException {
 	StringBuilder out = new StringBuilder();
