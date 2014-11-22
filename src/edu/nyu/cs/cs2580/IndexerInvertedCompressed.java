@@ -9,15 +9,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
-
 
 import edu.nyu.cs.cs2580.SearchEngine.Options;
 
@@ -80,6 +82,7 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 			  _term_position.clear();
 			  
 			  n_doc++;
+			  
 		      }
 		  } 
 		  finally {
@@ -92,7 +95,8 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 		  n_doc++;
 		  String nextDoc = DocReader.createFileInput(fileEntry);
 		  processDocument(nextDoc);
-		  
+		  if(n_doc>1000)
+			  break;
 		  _term_position.clear();
 		  
 	      }
@@ -138,23 +142,40 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	
 	System.out.println(_dictionary.size());
 	
-	for(int i : _dictionary.values()) {
-	    // get the term position list and skip pointer
-	    list =_term_list.get(i);
-	    skip = _skip_pointer.get(i);
-	    
-	    // create final posting for term
-	    posting = update_skip(skip,skip.size());
-	    posting.addAll(list);
-	    
-	    bits=elias_encode(posting,i);
-
-	    _postings.put(i, bits);
-	    
-	    
-	    bits=new BitSet();
-	    
-	}
+//	for(int i : _dictionary.values()) {
+//	    // get the term position list and skip pointer
+//	    list =_term_list.get(i);
+//	    skip = _skip_pointer.get(i);
+//	    
+//	    // create final posting for term
+//	    posting = update_skip(skip,skip.size());
+//	    posting.addAll(list);
+//	    
+//	    bits=elias_encode(posting,i);
+//
+//	    _postings.put(i, bits);
+//	    
+//	    
+//	    bits=new BitSet();
+//	    
+//	}
+	
+	List<String> keysAsArray = new ArrayList<String>(_dictionary.keySet());
+	
+	
+	
+	Random randomGenerator = new Random();
+	
+	for (int idx = 1; idx <= 500; ++idx){
+	      
+	      int ran=randomGenerator.nextInt(5);
+	      for(int i=0;i<ran;i++)
+	      {
+	    	  int randomInt = randomGenerator.nextInt(_dictionary.size());
+	    	  System.out.print(keysAsArray.get(randomInt)+" ");
+	      }
+	      System.out.println();
+	    }
 	
 	
 	
@@ -277,49 +298,49 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	s.close();
 	
 	// create the document
-	DocumentIndexed doc = new DocumentIndexed(_documents.size());
-	doc.setTitle(title);
-	doc.setNumViews(numViews);
-	doc.setUrl(url);
-	((DocumentIndexed) doc).removeAll();
+//	DocumentIndexed doc = new DocumentIndexed(_documents.size());
+//	doc.setTitle(title);
+//	doc.setNumViews(numViews);
+//	doc.setUrl(url);
+//	((DocumentIndexed) doc).removeAll();
 	System.out.println(url);
 
 	// add the document
-	_documents.add(doc); 
+//	_documents.add(doc); 
 	_numDocs++;
 	
 	// create postings lists and skip pointers
-	Vector<Integer> positions=new Vector<Integer>();
-	Vector<Integer> list=new Vector<Integer>();
-	Vector<Integer> skip=new Vector<Integer>();
+//	Vector<Integer> positions=new Vector<Integer>();
+//	Vector<Integer> list=new Vector<Integer>();
+//	Vector<Integer> skip=new Vector<Integer>();
 	for (Integer idx : uniqueTerms) {
 	    // increase number of docs this term appears in
 	    _termDocFrequency.put(idx, _termDocFrequency.get(idx) + 1);
 
-	    // get the vectors
-	    skip = _skip_pointer.get(idx);
-	    list = _term_list.get(idx);
-	    positions = _term_position.get(idx);
-	    
-	   // System.out.println(_dictionary.get(idx));
-	  //  positions=delta_encode(positions,idx);
-	    
-	    // add document ID
-	    list.add(_documents.size()-1);
-	    // add number of occurrences
-	    list.add(positions.size());
-	    // add all the positions in the document
-	    
-	    list.addAll(positions);
-	    
-	    // add document ID
-	    skip.add(_documents.size()-1);
-	    // add how far to skip to the last element of this documents list
-	    skip.add(list.size()-1);
-	    
-	    // set it
-	    _skip_pointer.put(idx, skip);
-	    _term_list.put(idx, list);
+//	    // get the vectors
+//	    skip = _skip_pointer.get(idx);
+//	    list = _term_list.get(idx);
+//	    positions = _term_position.get(idx);
+//	    
+//	   // System.out.println(_dictionary.get(idx));
+//	  //  positions=delta_encode(positions,idx);
+//	    
+//	    // add document ID
+//	    list.add(_documents.size()-1);
+//	    // add number of occurrences
+//	    list.add(positions.size());
+//	    // add all the positions in the document
+//	    
+//	    list.addAll(positions);
+//	    
+//	    // add document ID
+//	    skip.add(_documents.size()-1);
+//	    // add how far to skip to the last element of this documents list
+//	    skip.add(list.size()-1);
+//	    
+//	    // set it
+//	    _skip_pointer.put(idx, skip);
+//	    _term_list.put(idx, list);
 	    
 	}
 	
@@ -371,10 +392,10 @@ public class IndexerInvertedCompressed extends Indexer implements Serializable {
 	        _termDocFrequency.put(idx, 0);
 	
 		// create these things for new word
-		_skip_pointer.put(idx, new Vector<Integer>());
-		_term_list.put(idx, new Vector<Integer>());
-		_term_position.put(idx, new Vector<Integer>());
-		_postings.put(idx,new BitSet());
+//		_skip_pointer.put(idx, new Vector<Integer>());
+//		_term_list.put(idx, new Vector<Integer>());
+//		_term_position.put(idx, new Vector<Integer>());
+//		_postings.put(idx,new BitSet());
 	
 	    } else {
 		idx = _dictionary.get(token);

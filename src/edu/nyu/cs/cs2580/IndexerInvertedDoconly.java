@@ -50,7 +50,7 @@ public class IndexerInvertedDoconly extends Indexer implements Serializable {
   @Override
   public void constructIndex() throws IOException {
 
-      ReadCorpus DocReader = new ReadCorpus();
+      ReadCorpus DocReader = new ReadCorpus(0.42);
 
       String corpusDir = _options._corpusPrefix;
       System.out.println("Constructing index documents in: " + corpusDir);

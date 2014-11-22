@@ -43,7 +43,7 @@ class RankerFavorite extends Ranker {
   //  Double pos;
  //   int j;
     while(i != null) {
-      System.out.println("Next Called Doc "+i._docid);
+     // System.out.println("Next Called Doc "+i._docid);
       
       
     	  
@@ -115,7 +115,7 @@ class RankerFavorite extends Ranker {
 	    double idf = ( 1 + Math.log( (double) num_docs/df ) / Math.log(2) );
 	    score += tf * idf;
 	    
-	    System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
+	   // System.out.println(queryToken + ' ' + tf + ' ' + df + ' ' + idf + ' ' + score);
 	}
 	score = Math.log(score);
     }   

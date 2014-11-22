@@ -52,7 +52,7 @@ public class IndexerInvertedOccurrence extends Indexer implements Serializable {
     
     public void constructIndex() throws IOException {
 
-	ReadCorpus DocReader = new ReadCorpus();
+	ReadCorpus DocReader = new ReadCorpus(0.15);
 	
       String corpusDir = _options._corpusPrefix;
       System.out.println("Constructing index documents in: " + corpusDir);

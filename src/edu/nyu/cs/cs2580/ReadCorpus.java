@@ -18,13 +18,24 @@ import java.io.ByteArrayInputStream;
 
 
 public class ReadCorpus {
+	
+	Double _fact;
+	public ReadCorpus(double fact)
+	{
+		_fact=fact;
+	}
+	
+	public ReadCorpus()
+	{
+		_fact=1.0;
+	}
     
     // for test corpus
     public String createFileInput(String content) throws IOException {
 	StringBuilder out = new StringBuilder();
 	Scanner s = new Scanner(content).useDelimiter("\t");
 	String title = s.next();
-	String body = cleanAndStem(s.next());
+	String body = s.next();
 
 	out.append(title);
 	out.append('\t');
@@ -33,7 +44,7 @@ public class ReadCorpus {
 	out.append(s.next());
 	out.append('\t');
 	out.append(title.replace(" ", "_"));
-
+	s.close();
 	return out.toString();
     }
     
@@ -55,7 +66,7 @@ public class ReadCorpus {
 	out.append(' ');
 	body.append( getTagText(doc, "p"));
 	out.append(' ');
-	out.append( cleanAndStem(body.toString()) );
+	out.append( (body.toString()) );
 	
 	out.append('\t');
 	out.append('0');
@@ -71,9 +82,15 @@ public class ReadCorpus {
     private String getTagText(Document html_doc, String tag) {
 	StringBuilder sectionText = new StringBuilder();
 	Elements tags = html_doc.getElementsByTag(tag);
+	
+	int ctr=tags.size();
+	ctr=(int) (_fact*ctr);
+	
 	for (Element elem : tags) {
+		ctr--;
 	    sectionText.append(elem.text());
 	    sectionText.append(' ');
+	    if(ctr<0)break;
 	} 
 	return sectionText.toString();
     }
@@ -86,6 +103,7 @@ public class ReadCorpus {
 	while ((line = reader.readLine()) != null) {
 	    everything.append(line);
 	}
+	reader.close();
 	return everything.toString();
     }    
 
